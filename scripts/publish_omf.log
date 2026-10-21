@@ -1,0 +1,922 @@
+
+═══════════════════════════════════════════════════════
+  OmniMindFlow Diagnostic Funnel
+═══════════════════════════════════════════════════════
+  Клипов: 3 | Режим: только генерация
+
+═══════════════════════════════════════════════════════
+  Генерирую: funnel-1-pain
+═══════════════════════════════════════════════════════
+  ▶ Заголовок: "OmniMindFlow: разработчик теряет 98 минут в день"
+  ▶ Слайды: 3
+
+Создаю slideshow клип: "OmniMindFlow: разработчик теряет 98 минут в день"
+   Слайдов: 3 | Голос: ru-RU-DmitryNeural
+
+  Слайд 1/3 [Факт]...file:///C:/Users/v.serdyuk/Documents/AIGrowth/RiseCoreFlow/scripts/vk-slideshow.mjs:277
+    throw new Error(`${path.basename(cmd)} failed:\n${lines.slice(-3).join("\n") || err.slice(-200)}`);
+          ^
+
+Error: python failed:
+
+        "No audio was received. Please verify that your parameters are correct."
+    )
+edge_tts.exceptions.NoAudioReceived: No audio was received. Please verify that your parameters are correct.
+
+    at run (file:///C:/Users/v.serdyuk/Documents/AIGrowth/RiseCoreFlow/scripts/vk-slideshow.mjs:277:11)
+    at generateAudio (file:///C:/Users/v.serdyuk/Documents/AIGrowth/RiseCoreFlow/scripts/vk-slideshow.mjs:330:3)
+    at file:///C:/Users/v.serdyuk/Documents/AIGrowth/RiseCoreFlow/scripts/vk-slideshow.mjs:609:3
+    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)
+    at async node:internal/modules/esm/loader:643:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)
+
+Node.js v24.18.0
+file:///C:/Users/v.serdyuk/Documents/AIGrowth/RiseCoreFlow/scripts/funnel-omf.mjs:155
+  if (r.status !== 0) throw new Error("vk-slideshow.mjs failed");
+                            ^
+
+Error: vk-slideshow.mjs failed
+    at generateClip (file:///C:/Users/v.serdyuk/Documents/AIGrowth/RiseCoreFlow/scripts/funnel-omf.mjs:155:29)
+    at file:///C:/Users/v.serdyuk/Documents/AIGrowth/RiseCoreFlow/scripts/funnel-omf.mjs:337:3
+    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)
+    at async node:internal/modules/esm/loader:643:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)
+
+Node.js v24.18.0
+
+=======================================================
+  OmniMindFlow Diagnostic Funnel Publisher
+  2026-07-30 23:02 | dry-run=False | force=False
+=======================================================
+  Генерирую клипы через Node.js…
+
+  КРИТИЧЕСКАЯ ОШИБКА: Генерация клипов завершилась с ошибкой. Возможная причина: TTS недоступен (корпоративный прокси). Запусти вручную: node scripts/funnel-omf.mjs --vip-link ...
+
+=======================================================
+  OmniMindFlow Diagnostic Funnel Publisher
+  2026-08-03 09:00 | dry-run=False | force=False
+=======================================================
+  [skip] Последняя публикация 3д назад (cooldown 6д). Добавь --force для принудительного запуска.
+
+═══════════════════════════════════════════════════════
+  OmniMindFlow Diagnostic Funnel
+═══════════════════════════════════════════════════════
+  Клипов: 3 | Режим: только генерация
+
+═══════════════════════════════════════════════════════
+  Генерирую: funnel-1-pain
+═══════════════════════════════════════════════════════
+  ▶ Заголовок: "OmniMindFlow: разработчик теряет 98 минут в день"
+  ▶ Слайды: 3
+
+Создаю slideshow клип: "OmniMindFlow: разработчик теряет 98 минут в день"
+   Слайдов: 3 | Голос: ru-RU-DmitryNeural
+
+  Слайд 1/3 [Факт]...
+    → Computer developer.jpg (6000x4000) 
+    ⚠ Изображение недоступно (Image download failed: 403 https://upload.wikimedia.org/wiki), генерирую фон...  3.7s
+  Слайд 2/3 [Цена рутины]...
+    → Time sink.png (3578x3024) 
+    ⚠ Изображение недоступно (Image download failed: 403 https://upload.wikimedia.org/wiki), генерирую фон...  3.3s
+  Слайд 3/3 [Решение есть]...
+    → Induction Heating Automation By Inductroix.jpg (6916x3469) 
+    ⚠ Изображение недоступно (Image download failed: 403 https://upload.wikimedia.org/wiki), генерирую фон...  3.7s
+
+Склеиваю 3 слайда... 0.2 MB
+
+Готово: C:\Users\v.serdyuk\Documents\AIGrowth\RiseCoreFlow\funnel-1-pain.mp4
+
+  ✓ Готов: C:\Users\v.serdyuk\Documents\AIGrowth\RiseCoreFlow\funnel-1-pain.mp4 (0.2 MB)
+
+═══════════════════════════════════════════════════════
+  Генерирую: funnel-2-proof
+═══════════════════════════════════════════════════════
+  ▶ Заголовок: "OmniMindFlow: стендап с 45 до 8 минут"
+  ▶ Слайды: 3
+
+Создаю slideshow клип: "OmniMindFlow: стендап с 45 до 8 минут"
+   Слайдов: 3 | Голос: ru-RU-DmitryNeural
+
+  Слайд 1/3 [Кейс]...
+    ⚠ Изображение недоступно (Unexpected token 'Y', "You are ma"... is not valid JSON), генерирую фон...  4.1s
+  Слайд 2/3 [Как работает]...
+    ⚠ Изображение недоступно (Unexpected token 'Y', "You are ma"... is not valid JSON), генерирую фон...  3.5s
+  Слайд 3/3 [Твоя очередь]...
+    ⚠ Изображение недоступно (Unexpected token 'Y', "You are ma"... is not valid JSON), генерирую фон...  3.2s
+
+Склеиваю 3 слайда... 0.2 MB
+
+Готово: C:\Users\v.serdyuk\Documents\AIGrowth\RiseCoreFlow\funnel-2-proof.mp4
+
+  ✓ Готов: C:\Users\v.serdyuk\Documents\AIGrowth\RiseCoreFlow\funnel-2-proof.mp4 (0.2 MB)
+
+═══════════════════════════════════════════════════════
+  Генерирую: funnel-3-invite
+═══════════════════════════════════════════════════════
+  ▶ Заголовок: "OmniMindFlow: бесплатная диагностика workflow"
+  ▶ Слайды: 3
+
+Создаю slideshow клип: "OmniMindFlow: бесплатная диагностика workflow"
+   Слайдов: 3 | Голос: ru-RU-DmitryNeural
+
+  Слайд 1/3 [Диагностика]...
+    ⚠ Изображение недоступно (Unexpected token 'Y', "You are ma"... is not valid JSON), генерирую фон...  3.4s
+  Слайд 2/3 [Что получишь]...
+    ⚠ Изображение недоступно (Unexpected token 'Y', "You are ma"... is not valid JSON), генерирую фон...  3.3s
+  Слайд 3/3 [Записаться]...
+    ⚠ Изображение недоступно (Unexpected token 'Y', "You are ma"... is not valid JSON), генерирую фон...  5.1s
+
+Склеиваю 3 слайда... 0.2 MB
+
+Готово: C:\Users\v.serdyuk\Documents\AIGrowth\RiseCoreFlow\funnel-3-invite.mp4
+
+  ✓ Готов: C:\Users\v.serdyuk\Documents\AIGrowth\RiseCoreFlow\funnel-3-invite.mp4 (0.2 MB)
+
+═══════════════════════════════════════════════════════
+  Клипы сгенерированы. Добавь --post для публикации.
+═══════════════════════════════════════════════════════
+
+=======================================================
+  OmniMindFlow Diagnostic Funnel Publisher
+  2026-08-10 09:00 | dry-run=False | force=False
+=======================================================
+  Генерирую клипы через Node.js…
+  Клипы готовы.
+  → Telegram [main] funnel-1-pain.mp4… message_id=55
+  → Telegram [main] funnel-2-proof.mp4… message_id=56
+  → Telegram [main] funnel-3-invite.mp4… message_id=57
+  → Telegram [VIP] funnel-3-invite.mp4… message_id=12
+  → Telegram [VIP] текстовый анонс… message_id=13
+
+  Состояние сохранено → C:\Users\v.serdyuk\Documents\AIGrowth\RiseCoreFlow\scripts\funnel-state.json
+
+  Воронка опубликована!
+
+═══════════════════════════════════════════════════════
+  OmniMindFlow Diagnostic Funnel
+═══════════════════════════════════════════════════════
+  Клипов: 3 | Режим: только генерация
+
+═══════════════════════════════════════════════════════
+  Генерирую: funnel-1-pain
+═══════════════════════════════════════════════════════
+  ▶ Заголовок: "OmniMindFlow: разработчик теряет 98 минут в день"
+  ▶ Слайды: 3
+
+Создаю slideshow клип: "OmniMindFlow: разработчик теряет 98 минут в день"
+   Слайдов: 3 | Голос: ru-RU-DmitryNeural
+
+  Слайд 1/3 [Факт]...
+    → Computer developer.jpg (6000x4000) 
+    ⚠ Изображение недоступно (Image download failed: 403 https://upload.wikimedia.org/wiki), генерирую фон...  3.7s
+  Слайд 2/3 [Цена рутины]...
+    → Time sink.png (3578x3024) 
+    ⚠ Изображение недоступно (Image download failed: 403 https://upload.wikimedia.org/wiki), генерирую фон...  3.3s
+  Слайд 3/3 [Решение есть]...
+    → Induction Heating Automation By Inductroix.jpg (6916x3469) 
+    ⚠ Изображение недоступно (Image download failed: 403 https://upload.wikimedia.org/wiki), генерирую фон...  3.7s
+
+Склеиваю 3 слайда... 0.2 MB
+
+Готово: C:\Users\v.serdyuk\Documents\AIGrowth\RiseCoreFlow\funnel-1-pain.mp4
+
+  ✓ Готов: C:\Users\v.serdyuk\Documents\AIGrowth\RiseCoreFlow\funnel-1-pain.mp4 (0.2 MB)
+
+═══════════════════════════════════════════════════════
+  Генерирую: funnel-2-proof
+═══════════════════════════════════════════════════════
+  ▶ Заголовок: "OmniMindFlow: стендап с 45 до 8 минут"
+  ▶ Слайды: 3
+
+Создаю slideshow клип: "OmniMindFlow: стендап с 45 до 8 минут"
+   Слайдов: 3 | Голос: ru-RU-DmitryNeural
+
+  Слайд 1/3 [Кейс]...
+    ⚠ Изображение недоступно (Unexpected token 'Y', "You are ma"... is not valid JSON), генерирую фон...  4.1s
+  Слайд 2/3 [Как работает]...
+    ⚠ Изображение недоступно (Unexpected token 'Y', "You are ma"... is not valid JSON), генерирую фон...  3.5s
+  Слайд 3/3 [Твоя очередь]...
+    ⚠ Изображение недоступно (Unexpected token 'Y', "You are ma"... is not valid JSON), генерирую фон...  3.2s
+
+Склеиваю 3 слайда... 0.2 MB
+
+Готово: C:\Users\v.serdyuk\Documents\AIGrowth\RiseCoreFlow\funnel-2-proof.mp4
+
+  ✓ Готов: C:\Users\v.serdyuk\Documents\AIGrowth\RiseCoreFlow\funnel-2-proof.mp4 (0.2 MB)
+
+═══════════════════════════════════════════════════════
+  Генерирую: funnel-3-invite
+═══════════════════════════════════════════════════════
+  ▶ Заголовок: "OmniMindFlow: бесплатная диагностика workflow"
+  ▶ Слайды: 3
+
+Создаю slideshow клип: "OmniMindFlow: бесплатная диагностика workflow"
+   Слайдов: 3 | Голос: ru-RU-DmitryNeural
+
+  Слайд 1/3 [Диагностика]...
+    ⚠ Изображение недоступно (Unexpected token 'Y', "You are ma"... is not valid JSON), генерирую фон...  3.4s
+  Слайд 2/3 [Что получишь]...
+    ⚠ Изображение недоступно (Unexpected token 'Y', "You are ma"... is not valid JSON), генерирую фон...  3.3s
+  Слайд 3/3 [Записаться]...
+    ⚠ Изображение недоступно (Unexpected token 'Y', "You are ma"... is not valid JSON), генерирую фон...  5.1s
+
+Склеиваю 3 слайда... 0.2 MB
+
+Готово: C:\Users\v.serdyuk\Documents\AIGrowth\RiseCoreFlow\funnel-3-invite.mp4
+
+  ✓ Готов: C:\Users\v.serdyuk\Documents\AIGrowth\RiseCoreFlow\funnel-3-invite.mp4 (0.2 MB)
+
+═══════════════════════════════════════════════════════
+  Клипы сгенерированы. Добавь --post для публикации.
+═══════════════════════════════════════════════════════
+
+=======================================================
+  OmniMindFlow Diagnostic Funnel Publisher
+  2026-08-17 09:00 | dry-run=False | force=False
+=======================================================
+  Генерирую клипы через Node.js…
+  Клипы готовы.
+  → Telegram [main] funnel-1-pain.mp4… message_id=59
+  → Telegram [main] funnel-2-proof.mp4… message_id=60
+  → Telegram [main] funnel-3-invite.mp4… message_id=61
+  → Telegram [VIP] funnel-3-invite.mp4… message_id=14
+  → Telegram [VIP] текстовый анонс… message_id=15
+
+  Состояние сохранено → C:\Users\v.serdyuk\Documents\AIGrowth\RiseCoreFlow\scripts\funnel-state.json
+
+  Воронка опубликована!
+
+═══════════════════════════════════════════════════════
+  OmniMindFlow Diagnostic Funnel
+═══════════════════════════════════════════════════════
+  Клипов: 3 | Режим: только генерация
+
+═══════════════════════════════════════════════════════
+  Генерирую: funnel-1-pain
+═══════════════════════════════════════════════════════
+  ▶ Заголовок: "OmniMindFlow: разработчик теряет 98 минут в день"
+  ▶ Слайды: 3
+
+Создаю slideshow клип: "OmniMindFlow: разработчик теряет 98 минут в день"
+   Слайдов: 3 | Голос: ru-RU-DmitryNeural
+
+  Слайд 1/3 [Факт]...
+    → Computer developer.jpg (6000x4000) 
+    ⚠ Изображение недоступно (Image download failed: 403 https://upload.wikimedia.org/wiki), генерирую фон...  3.7s
+  Слайд 2/3 [Цена рутины]...
+    → Time sink.png (3578x3024) 
+    ⚠ Изображение недоступно (Image download failed: 403 https://upload.wikimedia.org/wiki), генерирую фон...  3.3s
+  Слайд 3/3 [Решение есть]...
+    → Induction Heating Automation By Inductroix.jpg (6916x3469) 
+    ⚠ Изображение недоступно (Image download failed: 403 https://upload.wikimedia.org/wiki), генерирую фон...  3.7s
+
+Склеиваю 3 слайда... 0.2 MB
+
+Готово: C:\Users\v.serdyuk\Documents\AIGrowth\RiseCoreFlow\funnel-1-pain.mp4
+
+  ✓ Готов: C:\Users\v.serdyuk\Documents\AIGrowth\RiseCoreFlow\funnel-1-pain.mp4 (0.2 MB)
+
+═══════════════════════════════════════════════════════
+  Генерирую: funnel-2-proof
+═══════════════════════════════════════════════════════
+  ▶ Заголовок: "OmniMindFlow: стендап с 45 до 8 минут"
+  ▶ Слайды: 3
+
+Создаю slideshow клип: "OmniMindFlow: стендап с 45 до 8 минут"
+   Слайдов: 3 | Голос: ru-RU-DmitryNeural
+
+  Слайд 1/3 [Кейс]...
+    ⚠ Изображение недоступно (Unexpected token 'Y', "You are ma"... is not valid JSON), генерирую фон...  4.1s
+  Слайд 2/3 [Как работает]...
+    ⚠ Изображение недоступно (Unexpected token 'Y', "You are ma"... is not valid JSON), генерирую фон...  3.5s
+  Слайд 3/3 [Твоя очередь]...
+    ⚠ Изображение недоступно (Unexpected token 'Y', "You are ma"... is not valid JSON), генерирую фон...  3.2s
+
+Склеиваю 3 слайда... 0.2 MB
+
+Готово: C:\Users\v.serdyuk\Documents\AIGrowth\RiseCoreFlow\funnel-2-proof.mp4
+
+  ✓ Готов: C:\Users\v.serdyuk\Documents\AIGrowth\RiseCoreFlow\funnel-2-proof.mp4 (0.2 MB)
+
+═══════════════════════════════════════════════════════
+  Генерирую: funnel-3-invite
+═══════════════════════════════════════════════════════
+  ▶ Заголовок: "OmniMindFlow: бесплатная диагностика workflow"
+  ▶ Слайды: 3
+
+Создаю slideshow клип: "OmniMindFlow: бесплатная диагностика workflow"
+   Слайдов: 3 | Голос: ru-RU-DmitryNeural
+
+  Слайд 1/3 [Диагностика]...
+    ⚠ Изображение недоступно (Unexpected token 'Y', "You are ma"... is not valid JSON), генерирую фон...  3.4s
+  Слайд 2/3 [Что получишь]...
+    ⚠ Изображение недоступно (Unexpected token 'Y', "You are ma"... is not valid JSON), генерирую фон...  3.3s
+  Слайд 3/3 [Записаться]...
+    → VIP experience (5991927).jpg (5197x3712) 
+    ⚠ Изображение недоступно (Image download failed: 403 https://upload.wikimedia.org/wiki), генерирую фон...  5.1s
+
+Склеиваю 3 слайда... 0.2 MB
+
+Готово: C:\Users\v.serdyuk\Documents\AIGrowth\RiseCoreFlow\funnel-3-invite.mp4
+
+  ✓ Готов: C:\Users\v.serdyuk\Documents\AIGrowth\RiseCoreFlow\funnel-3-invite.mp4 (0.2 MB)
+
+═══════════════════════════════════════════════════════
+  Клипы сгенерированы. Добавь --post для публикации.
+═══════════════════════════════════════════════════════
+
+=======================================================
+  OmniMindFlow Diagnostic Funnel Publisher
+  2026-08-24 09:00 | dry-run=False | force=False
+=======================================================
+  Генерирую клипы через Node.js…
+  Клипы готовы.
+  → Telegram [main] funnel-1-pain.mp4… message_id=62
+  → Telegram [main] funnel-2-proof.mp4… message_id=63
+  → Telegram [main] funnel-3-invite.mp4… message_id=64
+  → Telegram [VIP] funnel-3-invite.mp4… message_id=16
+  → Telegram [VIP] текстовый анонс… message_id=17
+
+  Состояние сохранено → C:\Users\v.serdyuk\Documents\AIGrowth\RiseCoreFlow\scripts\funnel-state.json
+
+  Воронка опубликована!
+
+═══════════════════════════════════════════════════════
+  OmniMindFlow Diagnostic Funnel
+═══════════════════════════════════════════════════════
+  Клипов: 3 | Режим: только генерация
+
+═══════════════════════════════════════════════════════
+  Генерирую: funnel-1-pain
+═══════════════════════════════════════════════════════
+  ▶ Заголовок: "OmniMindFlow: разработчик теряет 98 минут в день"
+  ▶ Слайды: 3
+
+Создаю slideshow клип: "OmniMindFlow: разработчик теряет 98 минут в день"
+   Слайдов: 3 | Голос: ru-RU-DmitryNeural
+
+  Слайд 1/3 [Факт]...
+    → Computer developer.jpg (6000x4000) 
+    ⚠ Изображение недоступно (Image download failed: 403 https://upload.wikimedia.org/wiki), генерирую фон...  3.7s
+  Слайд 2/3 [Цена рутины]...
+    → Time sink.png (3578x3024) 
+    ⚠ Изображение недоступно (Image download failed: 403 https://upload.wikimedia.org/wiki), генерирую фон...  3.3s
+  Слайд 3/3 [Решение есть]...
+    → Induction Heating Automation By Inductroix.jpg (6916x3469) 
+    ⚠ Изображение недоступно (Image download failed: 403 https://upload.wikimedia.org/wiki), генерирую фон...  3.7s
+
+Склеиваю 3 слайда... 0.2 MB
+
+Готово: C:\Users\v.serdyuk\Documents\AIGrowth\RiseCoreFlow\funnel-1-pain.mp4
+
+  ✓ Готов: C:\Users\v.serdyuk\Documents\AIGrowth\RiseCoreFlow\funnel-1-pain.mp4 (0.2 MB)
+
+═══════════════════════════════════════════════════════
+  Генерирую: funnel-2-proof
+═══════════════════════════════════════════════════════
+  ▶ Заголовок: "OmniMindFlow: стендап с 45 до 8 минут"
+  ▶ Слайды: 3
+
+Создаю slideshow клип: "OmniMindFlow: стендап с 45 до 8 минут"
+   Слайдов: 3 | Голос: ru-RU-DmitryNeural
+
+  Слайд 1/3 [Кейс]...
+    ⚠ Изображение недоступно (Unexpected token 'Y', "You are ma"... is not valid JSON), генерирую фон...  4.1s
+  Слайд 2/3 [Как работает]...
+    ⚠ Изображение недоступно (Unexpected token 'Y', "You are ma"... is not valid JSON), генерирую фон...  3.5s
+  Слайд 3/3 [Твоя очередь]...
+    ⚠ Изображение недоступно (Unexpected token 'Y', "You are ma"... is not valid JSON), генерирую фон...  3.2s
+
+Склеиваю 3 слайда... 0.2 MB
+
+Готово: C:\Users\v.serdyuk\Documents\AIGrowth\RiseCoreFlow\funnel-2-proof.mp4
+
+  ✓ Готов: C:\Users\v.serdyuk\Documents\AIGrowth\RiseCoreFlow\funnel-2-proof.mp4 (0.2 MB)
+
+═══════════════════════════════════════════════════════
+  Генерирую: funnel-3-invite
+═══════════════════════════════════════════════════════
+  ▶ Заголовок: "OmniMindFlow: бесплатная диагностика workflow"
+  ▶ Слайды: 3
+
+Создаю slideshow клип: "OmniMindFlow: бесплатная диагностика workflow"
+   Слайдов: 3 | Голос: ru-RU-DmitryNeural
+
+  Слайд 1/3 [Диагностика]...
+    ⚠ Изображение недоступно (Unexpected token 'Y', "You are ma"... is not valid JSON), генерирую фон...  3.4s
+  Слайд 2/3 [Что получишь]...
+    → Barcelona Business of Design Week DSC02679 (23992663614).jpg (5184x3888) 
+    ⚠ Изображение недоступно (Image download failed: 403 https://upload.wikimedia.org/wiki), генерирую фон...  3.3s
+  Слайд 3/3 [Записаться]...
+    → VIP experience (5991927).jpg (5197x3712) 
+    ⚠ Изображение недоступно (Image download failed: 403 https://upload.wikimedia.org/wiki), генерирую фон...  5.1s
+
+Склеиваю 3 слайда... 0.2 MB
+
+Готово: C:\Users\v.serdyuk\Documents\AIGrowth\RiseCoreFlow\funnel-3-invite.mp4
+
+  ✓ Готов: C:\Users\v.serdyuk\Documents\AIGrowth\RiseCoreFlow\funnel-3-invite.mp4 (0.2 MB)
+
+═══════════════════════════════════════════════════════
+  Клипы сгенерированы. Добавь --post для публикации.
+═══════════════════════════════════════════════════════
+
+=======================================================
+  OmniMindFlow Diagnostic Funnel Publisher
+  2026-08-31 09:00 | dry-run=False | force=False
+=======================================================
+  Генерирую клипы через Node.js…
+  Клипы готовы.
+  → Telegram [main] funnel-1-pain.mp4… message_id=65
+  → Telegram [main] funnel-2-proof.mp4… message_id=66
+  → Telegram [main] funnel-3-invite.mp4… message_id=67
+  → Telegram [VIP] funnel-3-invite.mp4… message_id=18
+  → Telegram [VIP] текстовый анонс… message_id=19
+
+  Состояние сохранено → C:\Users\v.serdyuk\Documents\AIGrowth\RiseCoreFlow\scripts\funnel-state.json
+
+  Воронка опубликована!
+
+═══════════════════════════════════════════════════════
+  OmniMindFlow Diagnostic Funnel
+═══════════════════════════════════════════════════════
+  Клипов: 3 | Режим: только генерация
+
+═══════════════════════════════════════════════════════
+  Генерирую: funnel-1-pain
+═══════════════════════════════════════════════════════
+  ▶ Заголовок: "OmniMindFlow: разработчик теряет 98 минут в день"
+  ▶ Слайды: 3
+
+Создаю slideshow клип: "OmniMindFlow: разработчик теряет 98 минут в день"
+   Слайдов: 3 | Голос: ru-RU-DmitryNeural
+
+  Слайд 1/3 [Факт]...
+    → Computer developer.jpg (6000x4000) 
+    ⚠ Изображение недоступно (Image download failed: 403 https://upload.wikimedia.org/wiki), генерирую фон...  3.7s
+  Слайд 2/3 [Цена рутины]...
+    → Time sink.png (3578x3024) 
+    ⚠ Изображение недоступно (Image download failed: 403 https://upload.wikimedia.org/wiki), генерирую фон...  3.3s
+  Слайд 3/3 [Решение есть]...
+    → Induction Heating Automation By Inductroix.jpg (6916x3469) 
+    ⚠ Изображение недоступно (Image download failed: 403 https://upload.wikimedia.org/wiki), генерирую фон...  3.7s
+
+Склеиваю 3 слайда... 0.2 MB
+
+Готово: C:\Users\v.serdyuk\Documents\AIGrowth\RiseCoreFlow\funnel-1-pain.mp4
+
+  ✓ Готов: C:\Users\v.serdyuk\Documents\AIGrowth\RiseCoreFlow\funnel-1-pain.mp4 (0.2 MB)
+
+═══════════════════════════════════════════════════════
+  Генерирую: funnel-2-proof
+═══════════════════════════════════════════════════════
+  ▶ Заголовок: "OmniMindFlow: стендап с 45 до 8 минут"
+  ▶ Слайды: 3
+
+Создаю slideshow клип: "OmniMindFlow: стендап с 45 до 8 минут"
+   Слайдов: 3 | Голос: ru-RU-DmitryNeural
+
+  Слайд 1/3 [Кейс]...
+    ⚠ Изображение недоступно (Unexpected token 'Y', "You are ma"... is not valid JSON), генерирую фон...  4.1s
+  Слайд 2/3 [Как работает]...
+    ⚠ Изображение недоступно (Unexpected token 'Y', "You are ma"... is not valid JSON), генерирую фон...  3.5s
+  Слайд 3/3 [Твоя очередь]...
+    ⚠ Изображение недоступно (Unexpected token 'Y', "You are ma"... is not valid JSON), генерирую фон...  3.2s
+
+Склеиваю 3 слайда... 0.2 MB
+
+Готово: C:\Users\v.serdyuk\Documents\AIGrowth\RiseCoreFlow\funnel-2-proof.mp4
+
+  ✓ Готов: C:\Users\v.serdyuk\Documents\AIGrowth\RiseCoreFlow\funnel-2-proof.mp4 (0.2 MB)
+
+═══════════════════════════════════════════════════════
+  Генерирую: funnel-3-invite
+═══════════════════════════════════════════════════════
+  ▶ Заголовок: "OmniMindFlow: бесплатная диагностика workflow"
+  ▶ Слайды: 3
+
+Создаю slideshow клип: "OmniMindFlow: бесплатная диагностика workflow"
+   Слайдов: 3 | Голос: ru-RU-DmitryNeural
+
+  Слайд 1/3 [Диагностика]...
+    ⚠ Изображение недоступно (Unexpected token 'Y', "You are ma"... is not valid JSON), генерирую фон...  3.4s
+  Слайд 2/3 [Что получишь]...
+    ⚠ Изображение недоступно (Unexpected token 'Y', "You are ma"... is not valid JSON), генерирую фон...  3.3s
+  Слайд 3/3 [Записаться]...
+    → VIP experience (5991927).jpg (5197x3712) 
+    ⚠ Изображение недоступно (Image download failed: 403 https://upload.wikimedia.org/wiki), генерирую фон...  5.1s
+
+Склеиваю 3 слайда... 0.2 MB
+
+Готово: C:\Users\v.serdyuk\Documents\AIGrowth\RiseCoreFlow\funnel-3-invite.mp4
+
+  ✓ Готов: C:\Users\v.serdyuk\Documents\AIGrowth\RiseCoreFlow\funnel-3-invite.mp4 (0.2 MB)
+
+═══════════════════════════════════════════════════════
+  Клипы сгенерированы. Добавь --post для публикации.
+═══════════════════════════════════════════════════════
+
+=======================================================
+  OmniMindFlow Diagnostic Funnel Publisher
+  2026-09-07 09:00 | dry-run=False | force=False
+=======================================================
+  Генерирую клипы через Node.js…
+  Клипы готовы.
+  → Telegram [main] funnel-1-pain.mp4… message_id=68
+  → Telegram [main] funnel-2-proof.mp4… message_id=69
+  → Telegram [main] funnel-3-invite.mp4… message_id=70
+  → Telegram [VIP] funnel-3-invite.mp4… message_id=20
+  → Telegram [VIP] текстовый анонс… message_id=21
+
+  Состояние сохранено → C:\Users\v.serdyuk\Documents\AIGrowth\RiseCoreFlow\scripts\funnel-state.json
+
+  Воронка опубликована!
+
+═══════════════════════════════════════════════════════
+  OmniMindFlow Diagnostic Funnel
+═══════════════════════════════════════════════════════
+  Клипов: 3 | Режим: только генерация
+
+═══════════════════════════════════════════════════════
+  Генерирую: funnel-1-pain
+═══════════════════════════════════════════════════════
+  ▶ Заголовок: "OmniMindFlow: разработчик теряет 98 минут в день"
+  ▶ Слайды: 3
+
+Создаю slideshow клип: "OmniMindFlow: разработчик теряет 98 минут в день"
+   Слайдов: 3 | Голос: ru-RU-DmitryNeural
+
+  Слайд 1/3 [Факт]...
+    → Computer developer.jpg (6000x4000) 
+    ⚠ Изображение недоступно (Image download failed: 403 https://upload.wikimedia.org/wiki), генерирую фон...  3.7s
+  Слайд 2/3 [Цена рутины]...
+    → Time sink.png (3578x3024) 
+    ⚠ Изображение недоступно (Image download failed: 403 https://upload.wikimedia.org/wiki), генерирую фон...  3.3s
+  Слайд 3/3 [Решение есть]...
+    → Induction Heating Automation By Inductroix.jpg (6916x3469) 
+    ⚠ Изображение недоступно (Image download failed: 403 https://upload.wikimedia.org/wiki), генерирую фон...  3.7s
+
+Склеиваю 3 слайда... 0.2 MB
+
+Готово: C:\Users\v.serdyuk\Documents\AIGrowth\RiseCoreFlow\funnel-1-pain.mp4
+
+  ✓ Готов: C:\Users\v.serdyuk\Documents\AIGrowth\RiseCoreFlow\funnel-1-pain.mp4 (0.2 MB)
+
+═══════════════════════════════════════════════════════
+  Генерирую: funnel-2-proof
+═══════════════════════════════════════════════════════
+  ▶ Заголовок: "OmniMindFlow: стендап с 45 до 8 минут"
+  ▶ Слайды: 3
+
+Создаю slideshow клип: "OmniMindFlow: стендап с 45 до 8 минут"
+   Слайдов: 3 | Голос: ru-RU-DmitryNeural
+
+  Слайд 1/3 [Кейс]...
+    ⚠ Изображение недоступно (Unexpected token 'Y', "You are ma"... is not valid JSON), генерирую фон...  4.1s
+  Слайд 2/3 [Как работает]...
+    ⚠ Изображение недоступно (Unexpected token 'Y', "You are ma"... is not valid JSON), генерирую фон...  3.5s
+  Слайд 3/3 [Твоя очередь]...
+    ⚠ Изображение недоступно (Unexpected token 'Y', "You are ma"... is not valid JSON), генерирую фон...  3.2s
+
+Склеиваю 3 слайда... 0.2 MB
+
+Готово: C:\Users\v.serdyuk\Documents\AIGrowth\RiseCoreFlow\funnel-2-proof.mp4
+
+  ✓ Готов: C:\Users\v.serdyuk\Documents\AIGrowth\RiseCoreFlow\funnel-2-proof.mp4 (0.2 MB)
+
+═══════════════════════════════════════════════════════
+  Генерирую: funnel-3-invite
+═══════════════════════════════════════════════════════
+  ▶ Заголовок: "OmniMindFlow: бесплатная диагностика workflow"
+  ▶ Слайды: 3
+
+Создаю slideshow клип: "OmniMindFlow: бесплатная диагностика workflow"
+   Слайдов: 3 | Голос: ru-RU-DmitryNeural
+
+  Слайд 1/3 [Диагностика]...
+    ⚠ Изображение недоступно (Unexpected token 'Y', "You are ma"... is not valid JSON), генерирую фон...  3.4s
+  Слайд 2/3 [Что получишь]...
+    → Barcelona Business of Design Week DSC02679 (23992663614).jpg (5184x3888) 
+    ⚠ Изображение недоступно (Image download failed: 403 https://upload.wikimedia.org/wiki), генерирую фон...  3.3s
+  Слайд 3/3 [Записаться]...
+    → VIP experience (5991927).jpg (5197x3712) 
+    ⚠ Изображение недоступно (Image download failed: 403 https://upload.wikimedia.org/wiki), генерирую фон...  5.1s
+
+Склеиваю 3 слайда... 0.2 MB
+
+Готово: C:\Users\v.serdyuk\Documents\AIGrowth\RiseCoreFlow\funnel-3-invite.mp4
+
+  ✓ Готов: C:\Users\v.serdyuk\Documents\AIGrowth\RiseCoreFlow\funnel-3-invite.mp4 (0.2 MB)
+
+═══════════════════════════════════════════════════════
+  Клипы сгенерированы. Добавь --post для публикации.
+═══════════════════════════════════════════════════════
+
+=======================================================
+  OmniMindFlow Diagnostic Funnel Publisher
+  2026-09-14 09:00 | dry-run=False | force=False
+=======================================================
+  Генерирую клипы через Node.js…
+  Клипы готовы.
+  → Telegram [main] funnel-1-pain.mp4… message_id=71
+  → Telegram [main] funnel-2-proof.mp4… message_id=72
+  → Telegram [main] funnel-3-invite.mp4… message_id=73
+  → Telegram [VIP] funnel-3-invite.mp4… message_id=22
+  → Telegram [VIP] текстовый анонс… message_id=23
+
+  Состояние сохранено → C:\Users\v.serdyuk\Documents\AIGrowth\RiseCoreFlow\scripts\funnel-state.json
+
+  Воронка опубликована!
+
+═══════════════════════════════════════════════════════
+  OmniMindFlow Diagnostic Funnel
+═══════════════════════════════════════════════════════
+  Клипов: 3 | Режим: только генерация
+
+═══════════════════════════════════════════════════════
+  Генерирую: funnel-1-pain
+═══════════════════════════════════════════════════════
+  ▶ Заголовок: "OmniMindFlow: разработчик теряет 98 минут в день"
+  ▶ Слайды: 3
+
+Создаю slideshow клип: "OmniMindFlow: разработчик теряет 98 минут в день"
+   Слайдов: 3 | Голос: ru-RU-DmitryNeural
+
+  Слайд 1/3 [Факт]...
+    → Computer developer.jpg (6000x4000) 
+    ⚠ Изображение недоступно (Image download failed: 403 https://upload.wikimedia.org/wiki), генерирую фон...  3.7s
+  Слайд 2/3 [Цена рутины]...
+    → Time sink.png (3578x3024) 
+    ⚠ Изображение недоступно (Image download failed: 403 https://upload.wikimedia.org/wiki), генерирую фон...  3.3s
+  Слайд 3/3 [Решение есть]...
+    → Induction Heating Automation By Inductroix.jpg (6916x3469) 
+    ⚠ Изображение недоступно (Image download failed: 403 https://upload.wikimedia.org/wiki), генерирую фон...  3.7s
+
+Склеиваю 3 слайда... 0.2 MB
+
+Готово: C:\Users\v.serdyuk\Documents\AIGrowth\RiseCoreFlow\funnel-1-pain.mp4
+
+  ✓ Готов: C:\Users\v.serdyuk\Documents\AIGrowth\RiseCoreFlow\funnel-1-pain.mp4 (0.2 MB)
+
+═══════════════════════════════════════════════════════
+  Генерирую: funnel-2-proof
+═══════════════════════════════════════════════════════
+  ▶ Заголовок: "OmniMindFlow: стендап с 45 до 8 минут"
+  ▶ Слайды: 3
+
+Создаю slideshow клип: "OmniMindFlow: стендап с 45 до 8 минут"
+   Слайдов: 3 | Голос: ru-RU-DmitryNeural
+
+  Слайд 1/3 [Кейс]...
+    ⚠ Изображение недоступно (Unexpected token 'Y', "You are ma"... is not valid JSON), генерирую фон...  4.1s
+  Слайд 2/3 [Как работает]...
+    ⚠ Изображение недоступно (Unexpected token 'Y', "You are ma"... is not valid JSON), генерирую фон...  3.5s
+  Слайд 3/3 [Твоя очередь]...
+    ⚠ Изображение недоступно (Unexpected token 'Y', "You are ma"... is not valid JSON), генерирую фон...  3.2s
+
+Склеиваю 3 слайда... 0.2 MB
+
+Готово: C:\Users\v.serdyuk\Documents\AIGrowth\RiseCoreFlow\funnel-2-proof.mp4
+
+  ✓ Готов: C:\Users\v.serdyuk\Documents\AIGrowth\RiseCoreFlow\funnel-2-proof.mp4 (0.2 MB)
+
+═══════════════════════════════════════════════════════
+  Генерирую: funnel-3-invite
+═══════════════════════════════════════════════════════
+  ▶ Заголовок: "OmniMindFlow: бесплатная диагностика workflow"
+  ▶ Слайды: 3
+
+Создаю slideshow клип: "OmniMindFlow: бесплатная диагностика workflow"
+   Слайдов: 3 | Голос: ru-RU-DmitryNeural
+
+  Слайд 1/3 [Диагностика]...
+    ⚠ Изображение недоступно (Unexpected token 'Y', "You are ma"... is not valid JSON), генерирую фон...  3.4s
+  Слайд 2/3 [Что получишь]...
+    → Barcelona Business of Design Week DSC02679 (23992663614).jpg (5184x3888) 
+    ⚠ Изображение недоступно (Image download failed: 403 https://upload.wikimedia.org/wiki), генерирую фон...  3.3s
+  Слайд 3/3 [Записаться]...
+    → VIP experience (5991927).jpg (5197x3712) 
+    ⚠ Изображение недоступно (Image download failed: 403 https://upload.wikimedia.org/wiki), генерирую фон...  5.1s
+
+Склеиваю 3 слайда... 0.2 MB
+
+Готово: C:\Users\v.serdyuk\Documents\AIGrowth\RiseCoreFlow\funnel-3-invite.mp4
+
+  ✓ Готов: C:\Users\v.serdyuk\Documents\AIGrowth\RiseCoreFlow\funnel-3-invite.mp4 (0.2 MB)
+
+═══════════════════════════════════════════════════════
+  Клипы сгенерированы. Добавь --post для публикации.
+═══════════════════════════════════════════════════════
+
+=======================================================
+  OmniMindFlow Diagnostic Funnel Publisher
+  2026-09-28 09:00 | dry-run=False | force=False
+=======================================================
+  Генерирую клипы через Node.js…
+  Клипы готовы.
+  → Telegram [main] funnel-1-pain.mp4… message_id=74
+  → Telegram [main] funnel-2-proof.mp4… message_id=75
+  → Telegram [main] funnel-3-invite.mp4… message_id=76
+  → Telegram [VIP] funnel-3-invite.mp4… message_id=24
+  → Telegram [VIP] текстовый анонс… message_id=25
+
+  Состояние сохранено → C:\Users\v.serdyuk\Documents\AIGrowth\RiseCoreFlow\scripts\funnel-state.json
+
+  Воронка опубликована!
+
+═══════════════════════════════════════════════════════
+  OmniMindFlow Diagnostic Funnel
+═══════════════════════════════════════════════════════
+  Клипов: 3 | Режим: только генерация
+
+═══════════════════════════════════════════════════════
+  Генерирую: funnel-1-pain
+═══════════════════════════════════════════════════════
+  ▶ Заголовок: "OmniMindFlow: разработчик теряет 98 минут в день"
+  ▶ Слайды: 3
+
+Создаю slideshow клип: "OmniMindFlow: разработчик теряет 98 минут в день"
+   Слайдов: 3 | Голос: ru-RU-DmitryNeural
+
+  Слайд 1/3 [Факт]...
+    → Computer developer.jpg (6000x4000) 
+    ⚠ Изображение недоступно (Image download failed: 403 https://upload.wikimedia.org/wiki), генерирую фон...  3.7s
+  Слайд 2/3 [Цена рутины]...
+    → Time sink.png (3578x3024) 
+    ⚠ Изображение недоступно (Image download failed: 403 https://upload.wikimedia.org/wiki), генерирую фон...  3.3s
+  Слайд 3/3 [Решение есть]...
+    → Induction Heating Automation By Inductroix.jpg (6916x3469) 
+    ⚠ Изображение недоступно (Image download failed: 403 https://upload.wikimedia.org/wiki), генерирую фон...  3.7s
+
+Склеиваю 3 слайда... 0.2 MB
+
+Готово: C:\Users\v.serdyuk\Documents\AIGrowth\RiseCoreFlow\funnel-1-pain.mp4
+
+  ✓ Готов: C:\Users\v.serdyuk\Documents\AIGrowth\RiseCoreFlow\funnel-1-pain.mp4 (0.2 MB)
+
+═══════════════════════════════════════════════════════
+  Генерирую: funnel-2-proof
+═══════════════════════════════════════════════════════
+  ▶ Заголовок: "OmniMindFlow: стендап с 45 до 8 минут"
+  ▶ Слайды: 3
+
+Создаю slideshow клип: "OmniMindFlow: стендап с 45 до 8 минут"
+   Слайдов: 3 | Голос: ru-RU-DmitryNeural
+
+  Слайд 1/3 [Кейс]...
+    ⚠ Изображение недоступно (Unexpected token 'Y', "You are ma"... is not valid JSON), генерирую фон...  4.1s
+  Слайд 2/3 [Как работает]...
+    ⚠ Изображение недоступно (Unexpected token 'Y', "You are ma"... is not valid JSON), генерирую фон...  3.5s
+  Слайд 3/3 [Твоя очередь]...
+    ⚠ Изображение недоступно (Unexpected token 'Y', "You are ma"... is not valid JSON), генерирую фон...  3.2s
+
+Склеиваю 3 слайда... 0.2 MB
+
+Готово: C:\Users\v.serdyuk\Documents\AIGrowth\RiseCoreFlow\funnel-2-proof.mp4
+
+  ✓ Готов: C:\Users\v.serdyuk\Documents\AIGrowth\RiseCoreFlow\funnel-2-proof.mp4 (0.2 MB)
+
+═══════════════════════════════════════════════════════
+  Генерирую: funnel-3-invite
+═══════════════════════════════════════════════════════
+  ▶ Заголовок: "OmniMindFlow: бесплатная диагностика workflow"
+  ▶ Слайды: 3
+
+Создаю slideshow клип: "OmniMindFlow: бесплатная диагностика workflow"
+   Слайдов: 3 | Голос: ru-RU-DmitryNeural
+
+  Слайд 1/3 [Диагностика]...
+    ⚠ Изображение недоступно (Unexpected token 'Y', "You are ma"... is not valid JSON), генерирую фон...  3.4s
+  Слайд 2/3 [Что получишь]...
+    ⚠ Изображение недоступно (Unexpected token 'Y', "You are ma"... is not valid JSON), генерирую фон...  3.3s
+  Слайд 3/3 [Записаться]...
+    → VIP experience (5991927).jpg (5197x3712) 
+    ⚠ Изображение недоступно (Image download failed: 403 https://upload.wikimedia.org/wiki), генерирую фон...  5.1s
+
+Склеиваю 3 слайда... 0.2 MB
+
+Готово: C:\Users\v.serdyuk\Documents\AIGrowth\RiseCoreFlow\funnel-3-invite.mp4
+
+  ✓ Готов: C:\Users\v.serdyuk\Documents\AIGrowth\RiseCoreFlow\funnel-3-invite.mp4 (0.2 MB)
+
+═══════════════════════════════════════════════════════
+  Клипы сгенерированы. Добавь --post для публикации.
+═══════════════════════════════════════════════════════
+
+=======================================================
+  OmniMindFlow Diagnostic Funnel Publisher
+  2026-10-05 09:00 | dry-run=False | force=False
+=======================================================
+  Генерирую клипы через Node.js…
+  Клипы готовы.
+  → Telegram [main] funnel-1-pain.mp4… message_id=78
+  → Telegram [main] funnel-2-proof.mp4… message_id=79
+  → Telegram [main] funnel-3-invite.mp4… message_id=80
+  → Telegram [VIP] funnel-3-invite.mp4… message_id=26
+  → Telegram [VIP] текстовый анонс… message_id=27
+
+  Состояние сохранено → C:\Users\v.serdyuk\Documents\AIGrowth\RiseCoreFlow\scripts\funnel-state.json
+
+  Воронка опубликована!
+
+═══════════════════════════════════════════════════════
+  OmniMindFlow Diagnostic Funnel
+═══════════════════════════════════════════════════════
+  Клипов: 3 | Режим: только генерация
+
+═══════════════════════════════════════════════════════
+  Генерирую: funnel-1-pain
+═══════════════════════════════════════════════════════
+  ▶ Заголовок: "OmniMindFlow: разработчик теряет 98 минут в день"
+  ▶ Слайды: 3
+
+Создаю slideshow клип: "OmniMindFlow: разработчик теряет 98 минут в день"
+   Слайдов: 3 | Голос: ru-RU-DmitryNeural
+
+  Слайд 1/3 [Факт]...file:///C:/Users/v.serdyuk/Documents/AIGrowth/RiseCoreFlow/scripts/vk-slideshow.mjs:277
+    throw new Error(`${path.basename(cmd)} failed:\n${lines.slice(-3).join("\n") || err.slice(-200)}`);
+          ^
+
+Error: python failed:
+aiohttp.client_exceptions.WSServerHandshakeError: 403, message='Invalid response status', url='wss://speech.platform.bing.com/consumer/speech/synthesize/readaloud/edge/v1?TrustedClientToken=6A5AA1D4EAFF4E9FB37E23D68491D6F4&ConnectionId=b0662f6fb90345d194ba7e3f9df17e7c&Sec-MS-GEC=8C5FA8E7D875AE1FDCBF2B3A3CAEEBEAE0E7D8D5A5C41CF576C66C0E1E545B36&Sec-MS-GEC-Version=1-143.0.3650.75'
+    raise WSServerHandshakeError(
+aiohttp.client_exceptions.WSServerHandshakeError: 403, message='Invalid response status', url='wss://speech.platform.bing.com/consumer/speech/synthesize/readaloud/edge/v1?TrustedClientToken=6A5AA1D4EAFF4E9FB37E23D68491D6F4&ConnectionId=f850633f97814a2f92a0901b9454890f&Sec-MS-GEC=8C5FA8E7D875AE1FDCBF2B3A3CAEEBEAE0E7D8D5A5C41CF576C66C0E1E545B36&Sec-MS-GEC-Version=1-143.0.3650.75'
+    at run (file:///C:/Users/v.serdyuk/Documents/AIGrowth/RiseCoreFlow/scripts/vk-slideshow.mjs:277:11)
+    at generateAudio (file:///C:/Users/v.serdyuk/Documents/AIGrowth/RiseCoreFlow/scripts/vk-slideshow.mjs:330:3)
+    at file:///C:/Users/v.serdyuk/Documents/AIGrowth/RiseCoreFlow/scripts/vk-slideshow.mjs:609:3
+    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)
+    at async node:internal/modules/esm/loader:643:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)
+
+Node.js v24.18.0
+file:///C:/Users/v.serdyuk/Documents/AIGrowth/RiseCoreFlow/scripts/funnel-omf.mjs:155
+  if (r.status !== 0) throw new Error("vk-slideshow.mjs failed");
+                            ^
+
+Error: vk-slideshow.mjs failed
+    at generateClip (file:///C:/Users/v.serdyuk/Documents/AIGrowth/RiseCoreFlow/scripts/funnel-omf.mjs:155:29)
+    at file:///C:/Users/v.serdyuk/Documents/AIGrowth/RiseCoreFlow/scripts/funnel-omf.mjs:337:3
+    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)
+    at async node:internal/modules/esm/loader:643:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)
+
+Node.js v24.18.0
+
+=======================================================
+  OmniMindFlow Diagnostic Funnel Publisher
+  2026-10-12 09:00 | dry-run=False | force=False
+=======================================================
+  Генерирую клипы через Node.js…
+
+  КРИТИЧЕСКАЯ ОШИБКА: Генерация клипов завершилась с ошибкой. Возможная причина: TTS недоступен (корпоративный прокси). Запусти вручную: node scripts/funnel-omf.mjs --vip-link ...
+
+═══════════════════════════════════════════════════════
+  OmniMindFlow Diagnostic Funnel
+═══════════════════════════════════════════════════════
+  Клипов: 3 | Режим: только генерация
+
+═══════════════════════════════════════════════════════
+  Генерирую: funnel-1-pain
+═══════════════════════════════════════════════════════
+  ▶ Заголовок: "OmniMindFlow: разработчик теряет 98 минут в день"
+  ▶ Слайды: 3
+
+Создаю slideshow клип: "OmniMindFlow: разработчик теряет 98 минут в день"
+   Слайдов: 3 | Голос: ru-RU-DmitryNeural
+
+  Слайд 1/3 [Факт]...file:///C:/Users/v.serdyuk/Documents/AIGrowth/RiseCoreFlow/scripts/vk-slideshow.mjs:277
+    throw new Error(`${path.basename(cmd)} failed:\n${lines.slice(-3).join("\n") || err.slice(-200)}`);
+          ^
+
+Error: python failed:
+aiohttp.client_exceptions.WSServerHandshakeError: 403, message='Invalid response status', url='wss://speech.platform.bing.com/consumer/speech/synthesize/readaloud/edge/v1?TrustedClientToken=6A5AA1D4EAFF4E9FB37E23D68491D6F4&ConnectionId=9bf6f16d58e747b9b54c35c68395ad5a&Sec-MS-GEC=295C6D437757BE029F1C0619FB08318DAB3E1AF78F21A6ADF9D680C8205ADB43&Sec-MS-GEC-Version=1-143.0.3650.75'
+    raise WSServerHandshakeError(
+aiohttp.client_exceptions.WSServerHandshakeError: 403, message='Invalid response status', url='wss://speech.platform.bing.com/consumer/speech/synthesize/readaloud/edge/v1?TrustedClientToken=6A5AA1D4EAFF4E9FB37E23D68491D6F4&ConnectionId=669ad654a7c54a40a0cc2e7f42a18282&Sec-MS-GEC=295C6D437757BE029F1C0619FB08318DAB3E1AF78F21A6ADF9D680C8205ADB43&Sec-MS-GEC-Version=1-143.0.3650.75'
+    at run (file:///C:/Users/v.serdyuk/Documents/AIGrowth/RiseCoreFlow/scripts/vk-slideshow.mjs:277:11)
+    at generateAudio (file:///C:/Users/v.serdyuk/Documents/AIGrowth/RiseCoreFlow/scripts/vk-slideshow.mjs:330:3)
+    at file:///C:/Users/v.serdyuk/Documents/AIGrowth/RiseCoreFlow/scripts/vk-slideshow.mjs:609:3
+    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)
+    at async node:internal/modules/esm/loader:643:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)
+
+Node.js v24.18.0
+file:///C:/Users/v.serdyuk/Documents/AIGrowth/RiseCoreFlow/scripts/funnel-omf.mjs:155
+  if (r.status !== 0) throw new Error("vk-slideshow.mjs failed");
+                            ^
+
+Error: vk-slideshow.mjs failed
+    at generateClip (file:///C:/Users/v.serdyuk/Documents/AIGrowth/RiseCoreFlow/scripts/funnel-omf.mjs:155:29)
+    at file:///C:/Users/v.serdyuk/Documents/AIGrowth/RiseCoreFlow/scripts/funnel-omf.mjs:337:3
+    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)
+    at async node:internal/modules/esm/loader:643:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)
+
+Node.js v24.18.0
+
+=======================================================
+  OmniMindFlow Diagnostic Funnel Publisher
+  2026-10-19 09:00 | dry-run=False | force=False
+=======================================================
+  Генерирую клипы через Node.js…
+
+  КРИТИЧЕСКАЯ ОШИБКА: Генерация клипов завершилась с ошибкой. Возможная причина: TTS недоступен (корпоративный прокси). Запусти вручную: node scripts/funnel-omf.mjs --vip-link ...

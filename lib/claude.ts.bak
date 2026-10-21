@@ -1,0 +1,98 @@
+import Anthropic from "@anthropic-ai/sdk";
+
+const client = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY,
+});
+
+export const SYSTEM_PROMPT = `Ты — маркетинговый AI-агент для AI/SaaS проектов.
+
+Правила написания постов для Telegram:
+- Первые 2 строки = hook (цепляющий, без "Привет!" и вводных)
+- Конкретные цифры вместо абстракций
+- Профиль/модуль упоминается органично, не рекламно
+- CTA в конце — один, конкретный
+- Длина: 150–300 слов для образовательных, 80–150 для комьюнити
+- Без эмодзи в основном тексте (только в списках ✓)
+- Tone of voice: технологичный, прямой, как умный коллега
+- Без корпоративного языка ("инновационное решение", "уникальный продукт")
+- Без восклицательных знаков в заголовках
+
+Отвечай только текстом поста, без пояснений и обёрток.`;
+
+export async function generatePost(params: {
+  projectContext: string;
+  day: number;
+  profile: string;
+  type: string;
+  title: string;
+  additionalContext?: string;
+}): Promise<string> {
+  const { projectContext, day, profile, type, title, additionalContext } = params;
+
+  const profileNames: Record<string, string> = {
+    developer: "DEVELOPER (разработчик)",
+    founder: "FOUNDER (основатель стартапа)",
+    pm: "PRODUCT MANAGER",
+    all: "все профили",
+  };
+
+  const typeNames: Record<string, string> = {
+    education: "образовательный (конкретная польза)",
+    proof: "доказательство (кейс, данные, демо)",
+    community: "комьюнити (опрос, вопрос, итоги)",
+  };
+
+  const message = await client.messages.create({
+    model: "claude-opus-4-5",
+    max_tokens: 1024,
+    system: SYSTEM_PROMPT,
+    messages: [
+      {
+        role: "user",
+        content: `Напиши пост для Telegram.
+
+КОНТЕКСТ ПРОЕКТА:
+${projectContext}
+
+ПАРАМЕТРЫ ПОСТА:
+- День контент-плана: ${day}
+- Профиль аудитории: ${profileNames[profile] || profile}
+- Тип поста: ${typeNames[type] || type}
+- Тема/заголовок: ${title}
+${additionalContext ? `\nДОПОЛНИТЕЛЬНЫЙ КОНТЕКСТ:\n${additionalContext}` : ""}
+
+Напиши готовый текст поста.`,
+      },
+    ],
+  });
+
+  const content = message.content[0];
+  if (content.type === "text") return content.text;
+  return "";
+}
+
+export async function improvePost(content: string, instruction: string): Promise<string> {
+  const message = await client.messages.create({
+    model: "claude-opus-4-5",
+    max_tokens: 1024,
+    system: SYSTEM_PROMPT,
+    messages: [
+      {
+        role: "user",
+        content: `Улучши этот пост по инструкции.
+
+ОРИГИНАЛЬНЫЙ ПОСТ:
+${content}
+
+ИНСТРУКЦИЯ:
+${instruction}
+
+Верни только улучшенный текст поста.`,
+      },
+    ],
+  });
+
+  const resp = message.content[0];
+  if (resp.type === "text") return resp.text;
+  return content;
+}

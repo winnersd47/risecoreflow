@@ -1,0 +1,22 @@
+{
+  "title": "OmniMindFlow: разработчик теряет 98 минут в день",
+  "brand": "OmniMindFlow",
+  "voice": "ru-RU-DmitryNeural",
+  "slides": [
+    {
+      "text": "98 минут в день. Столько средний разработчик тратит на рутину: стендапы, переключение контекста, ручной сбор метрик.",
+      "label": "Факт",
+      "imageQuery": "developer computer work office tired burnout"
+    },
+    {
+      "text": "8 часов в неделю — это целый рабочий день. Он уходит на копирование данных и переключения, а не на продукт.",
+      "label": "Цена рутины",
+      "imageQuery": "time clock wasted calendar stress productivity"
+    },
+    {
+      "text": "Существует способ сократить это до 12 минут. Без потери качества. Как — рассказываю в VIP-канале.",
+      "label": "Решение есть",
+      "imageQuery": "solution technology automation business growth chart"
+    }
+  ]
+}

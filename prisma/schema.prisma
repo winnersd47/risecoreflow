@@ -1,0 +1,66 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  channel     String?
+  chatUrl     String?
+  botUrl      String?
+  siteUrl     String?
+  wave        String   @default("Wave 1")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  posts       Post[]
+  tasks       Task[]
+  metrics     Metric[]
+}
+
+model Post {
+  id          String    @id @default(cuid())
+  projectId   String
+  project     Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  day         Int
+  title       String
+  content     String?
+  profile     String    @default("all")
+  type        String    @default("education")
+  status      String    @default("draft")
+  cta         String?
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Task {
+  id          String   @id @default(cuid())
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  subject     String
+  description String
+  category    String   @default("content")
+  status      String   @default("pending")
+  priority    Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Metric {
+  id               String   @id @default(cuid())
+  projectId        String
+  project          Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  week             Int
+  subscribers      Int?
+  err              Float?
+  ctaClicks        Int?
+  botRegistrations Int?
+  notes            String?
+  createdAt        DateTime @default(now())
+}

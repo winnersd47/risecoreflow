@@ -1,0 +1,16 @@
+[
+  {
+    "id": "e6e98662-c361-409f-bbf9-a331f3000d93",
+    "email": "winnersd@gmail.com",
+    "username": "admin",
+    "passwordHash": "$2b$12$vV.uBTBllrIDARSi3bMGf.21lERzYeM9XpnzZR328CIAK9LLrEHYa",
+    "plan": "agency"
+  },
+  {
+    "id": "6b7f25b9-fe59-4cee-9daa-d0b18b38e66d",
+    "email": "victorysd.95@gmail.com",
+    "username": "victorysd",
+    "passwordHash": "$2b$12$Wp82LrBrsnolB8Nq252MouwyuR1B7VTKY262wfPZw5eWUGCSvx5yy",
+    "plan": "agency"
+  }
+]

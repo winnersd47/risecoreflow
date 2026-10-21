@@ -1,0 +1,5 @@
+export async function generateStaticParams() { return [] }
+
+export default function SettingsPage() {
+  return <div>SettingsPage</div>
+}

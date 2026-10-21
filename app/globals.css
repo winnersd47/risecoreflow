@@ -1,0 +1,94 @@
+@import "tailwindcss";
+
+:root {
+  --background: #07060d;
+  --surface: #0d0b18;
+  --surface-2: #13112a;
+  --border: #1e1c38;
+  --border-subtle: #16142e;
+  --foreground: #ede8ff;
+  --foreground-muted: #6b6885;
+  --accent: #f59e0b;
+  --accent-dim: #92400e;
+  --accent-2: #6366f1;
+  --accent-2-dim: #3730a3;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--surface);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-dim);
+}
+
+.input-field {
+  width: 100%;
+  background: #0d0b18;
+  border: 1px solid #1e1c38;
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  color: #ede8ff;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.input-field:focus {
+  border-color: rgba(245, 158, 11, 0.5);
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.08);
+}
+
+.input-field::placeholder {
+  color: #6b6885;
+}
+
+/* Hover utilities for server components */
+.hover-row:hover {
+  background: #0d0b18 !important;
+}
+.hover-task:hover {
+  background: #13112a !important;
+}
+.hover-quicklink {
+  transition: border-color 0.15s, background 0.15s;
+}
+.hover-quicklink:hover {
+  border-color: rgba(245, 158, 11, 0.3) !important;
+  background: #1a1735 !important;
+}
+.hover-project-name:hover {
+  opacity: 0.75;
+}
