@@ -1,0 +1,41 @@
+name: RiseCoreFlow — Посты личного бренда
+
+on:
+  schedule:
+    - cron: '0 8 * * 1,3,5'  # 11:00 MSK пн/ср/пт
+  workflow_dispatch:           # ручной запуск
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Create tg-bot/.env
+        run: |
+          mkdir -p tg-bot
+          cat > tg-bot/.env <<'EOF'
+          BOT_TOKEN=${{ secrets.BOT_TOKEN }}
+          OMF_CHANNEL_PROFILES_ID=${{ secrets.OMF_CHANNEL_PROFILES_ID }}
+          WEF_CHANNEL_SIGNALS_ID=${{ secrets.WEF_CHANNEL_SIGNALS_ID }}
+          GROUP_AIGC_ID=${{ secrets.GROUP_AIGC_ID }}
+          EOF
+
+      - name: Publish next brand post
+        run: python scripts/brand-posts.py publish next
+
+      - name: Save brand-posts-state.json
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add scripts/brand-posts-state.json || true
+          git diff --staged --quiet || \
+            git commit -m "chore: update brand-posts-state [skip ci]" && \
+            git push
