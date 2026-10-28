@@ -39,8 +39,10 @@ from dotenv import load_dotenv
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, LabeledPrice
 from telegram.ext import (
     Application, CommandHandler, MessageHandler,
-    CallbackQueryHandler, PreCheckoutQueryHandler, ContextTypes, filters,
+    CallbackQueryHandler, PreCheckoutQueryHandler, InlineQueryHandler,
+    ContextTypes, filters,
 )
+from telegram import InlineQueryResultArticle, InputTextMessageContent
 
 load_dotenv()
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
@@ -68,6 +70,12 @@ OMF_VIP = int(os.getenv("OMF_CHANNEL_VIP_ID", "0"))
 # WinExtraFlow channels
 WEF_SIGNALS = int(os.getenv("WEF_CHANNEL_SIGNALS_ID", "0"))
 WEF_VIP = int(os.getenv("WEF_CHANNEL_VIP_ID", "0"))
+
+# RiseCoreFlow channels
+RCF_CHANNEL = int(os.getenv("RCF_CHANNEL_ID", "0"))
+
+# AIGrowthFlow channels
+AGF_CHANNEL = int(os.getenv("AGF_CHANNEL_ID", "0"))
 
 # Shared
 AIGC_GROUP = int(os.getenv("GROUP_AIGC_ID", "0"))
@@ -387,6 +395,16 @@ _AI_CONTEXTS = {
         "Отвечай кратко и по делу, на русском языке. "
         "Фокус: снижение затрат на обслуживание, умная аналитика парка, автоматизация техобслуживания."
     ),
+    "rcf": (
+        "Ты AI-ассистент RiseCoreFlow — платформы для развития личного бренда и карьеры в ИИ. "
+        "Отвечай кратко и по делу, на русском языке. "
+        "Фокус: позиционирование, контент-стратегия, экспертность в AI, рост аудитории в Telegram."
+    ),
+    "agf": (
+        "Ты AI-ассистент AIGrowthFlow — маркетплейса ИИ-решений для российских предпринимателей. "
+        "Отвечай кратко и по делу, на русском языке. "
+        "Фокус: подбор AI-инструментов под бизнес, ROI автоматизации, внедрение без технических знаний."
+    ),
 }
 
 _AI_FALLBACK = "Извини, AI-движок временно недоступен. Попробуй позже."
@@ -539,18 +557,51 @@ async def _ask_ai(question: str, project: str = "omf") -> tuple[str, str, bool, 
             attempts.append({"provider": "groq", "latency_ms": latency, "error": str(e)[:200]})
             logger.warning("Groq: %s", e)
 
-    # 4. OpenRouter (free models: mistral-7b, phi-3, llama-3)
+    # 4. OpenRouter (free models: gemma-4-31b, gemma-4-26b)
     or_key = os.getenv("OPENROUTER_API_KEY", "")
     if or_key:
+        for or_model in ("nvidia/nemotron-3-ultra-550b-a55b:free", "openrouter/free", "dots-studio/dots-3-note-preview:free"):
+            t0 = time.monotonic()
+            try:
+                async with httpx.AsyncClient(timeout=30, verify=ssl) as c:
+                    r = await c.post(
+                        "https://openrouter.ai/api/v1/chat/completions",
+                        headers={"Authorization": f"Bearer {or_key}",
+                                 "Content-Type": "application/json"},
+                        content=json.dumps({
+                            "model": or_model,
+                            "messages": [
+                                {"role": "system", "content": system},
+                                {"role": "user", "content": question},
+                            ],
+                            "max_tokens": 512,
+                        }).encode("utf-8"),
+                    )
+                data = r.json()
+                latency = round((time.monotonic() - t0) * 1000)
+                choices = data.get("choices", [])
+                if choices:
+                    attempts.append({"provider": f"openrouter/{or_model.split('/')[1]}", "latency_ms": latency, "error": None})
+                    return choices[0]["message"]["content"], "openrouter", True, attempts
+                attempts.append({"provider": f"openrouter/{or_model.split('/')[1]}", "latency_ms": latency,
+                                 "error": f"no choices: {str(data)[:120]}"})
+            except Exception as e:
+                latency = round((time.monotonic() - t0) * 1000)
+                attempts.append({"provider": f"openrouter/{or_model.split('/')[1]}", "latency_ms": latency, "error": str(e)[:200]})
+                logger.warning("OpenRouter %s: %s", or_model, e)
+
+    # 5. Mistral AI (European, works from RU, free tier available)
+    mistral_key = os.getenv("MISTRAL_API_KEY", "")
+    if mistral_key:
         t0 = time.monotonic()
         try:
             async with httpx.AsyncClient(timeout=30, verify=ssl) as c:
                 r = await c.post(
-                    "https://openrouter.ai/api/v1/chat/completions",
-                    headers={"Authorization": f"Bearer {or_key}",
+                    "https://api.mistral.ai/v1/chat/completions",
+                    headers={"Authorization": f"Bearer {mistral_key}",
                              "Content-Type": "application/json"},
                     content=json.dumps({
-                        "model": "mistralai/mistral-7b-instruct:free",
+                        "model": "mistral-small-latest",
                         "messages": [
                             {"role": "system", "content": system},
                             {"role": "user", "content": question},
@@ -562,16 +613,16 @@ async def _ask_ai(question: str, project: str = "omf") -> tuple[str, str, bool, 
             latency = round((time.monotonic() - t0) * 1000)
             choices = data.get("choices", [])
             if choices:
-                attempts.append({"provider": "openrouter", "latency_ms": latency, "error": None})
-                return choices[0]["message"]["content"], "openrouter", True, attempts
-            attempts.append({"provider": "openrouter", "latency_ms": latency,
+                attempts.append({"provider": "mistral", "latency_ms": latency, "error": None})
+                return choices[0]["message"]["content"], "mistral", True, attempts
+            attempts.append({"provider": "mistral", "latency_ms": latency,
                              "error": f"no choices: {str(data)[:120]}"})
         except Exception as e:
             latency = round((time.monotonic() - t0) * 1000)
-            attempts.append({"provider": "openrouter", "latency_ms": latency, "error": str(e)[:200]})
-            logger.warning("OpenRouter: %s", e)
+            attempts.append({"provider": "mistral", "latency_ms": latency, "error": str(e)[:200]})
+            logger.warning("Mistral: %s", e)
 
-    # 5. Gemini (requires valid AIza... key from aistudio.google.com)
+    # 6. Gemini (requires valid AIza... key from aistudio.google.com)
     gemini_key = os.getenv("GEMINI_API_KEY", "")
     if gemini_key and gemini_key.startswith("AIza"):
         t0 = time.monotonic()
@@ -611,7 +662,11 @@ def _main_menu_kb() -> InlineKeyboardMarkup:
             InlineKeyboardButton("📈 WinExtraFlow", callback_data="menu:wef"),
         ],
         [
-            InlineKeyboardButton("🚗 AutoEvoFlow", callback_data="menu:aef"),
+            InlineKeyboardButton("🚗 AutoEvoFlow",  callback_data="menu:aef"),
+            InlineKeyboardButton("🎯 RiseCoreFlow", callback_data="menu:rcf"),
+        ],
+        [
+            InlineKeyboardButton("🚀 AIGrowthFlow", callback_data="menu:agf"),
         ],
         [
             InlineKeyboardButton("💰 Мой баланс", callback_data="menu:balance"),
@@ -744,6 +799,26 @@ async def _publish(context, channel_id, text, forward_to_aigc=True):
     return result
 
 
+def _rcf_menu_kb() -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup([
+        [
+            InlineKeyboardButton("💬 Спросить AI", callback_data="ask:rcf"),
+            InlineKeyboardButton("📌 Личный бренд", callback_data="tips:rcf"),
+        ],
+        [InlineKeyboardButton("◀️ Главное меню", callback_data="menu:main")],
+    ])
+
+
+def _agf_menu_kb() -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup([
+        [
+            InlineKeyboardButton("💬 Спросить AI", callback_data="ask:agf"),
+            InlineKeyboardButton("🛒 Маркетплейс", callback_data="tips:agf"),
+        ],
+        [InlineKeyboardButton("◀️ Главное меню", callback_data="menu:main")],
+    ])
+
+
 # ═══ USER COMMANDS ════════════════════════════════════════════════════════════
 
 async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -762,9 +837,12 @@ async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         text = (
             f"Привет, {user.first_name}! 👋\n\n"
-            f"<b>AIGrowth Bot</b> — твой AI-помощник для:\n"
-            f"• OmniMindFlow — AI OS для работы\n"
-            f"• WinExtraFlow — анализ торговых сигналов\n\n"
+            f"<b>AIGrowth Bot</b> — твой AI-помощник для 5 проектов:\n"
+            f"• 🤖 OmniMindFlow — AI OS для работы\n"
+            f"• 📈 WinExtraFlow — анализ торговых сигналов\n"
+            f"• 🚗 AutoEvoFlow — оптимизация автопарка\n"
+            f"• 🎯 RiseCoreFlow — личный бренд в AI\n"
+            f"• 🚀 AIGrowthFlow — маркетплейс ИИ-решений\n\n"
             f"🎉 Тебе начислено <b>{credits} кредитов</b> — это бесплатные AI-запросы.{bonus_note}\n\n"
             f"Выбери проект:"
         )
@@ -775,6 +853,41 @@ async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"Выбери проект:"
         )
     await update.message.reply_text(text, parse_mode="HTML", reply_markup=_main_menu_kb())
+
+
+_GUIDE_KEYWORDS = (
+    "как работать", "что умеешь", "что умеет", "помощь", "помоги",
+    "инструкция", "гайд", "guide", "команды", "как пользоваться",
+    "как использовать", "что делать", "с чего начать", "как начать",
+)
+
+def _guide_text() -> str:
+    return (
+        "📖 <b>Как работать с ботом AIGrowth</b>\n\n"
+        "<b>5 проектов — 5 AI-ассистентов:</b>\n"
+        "• /ask omf <i>вопрос</i> — OmniMindFlow (AI OS, работа)\n"
+        "• /ask wef <i>вопрос</i> — WinExtraFlow (трейдинг, сигналы)\n"
+        "• /ask aef <i>вопрос</i> — AutoEvoFlow (автопарк)\n"
+        "• /ask rcf <i>вопрос</i> — RiseCoreFlow (личный бренд)\n"
+        "• /ask agf <i>вопрос</i> — AIGrowthFlow (ИИ для бизнеса)\n"
+        "• /aef — аудит автопарка (воронка)\n"
+        "• /balance — твои кредиты\n"
+        "• /ref — реферальная ссылка\n\n"
+        "<b>Примеры вопросов:</b>\n"
+        "<code>/ask omf Как автоматизировать стендап?</code>\n"
+        "<code>/ask wef Как читать WEF Score?</code>\n"
+        "<code>/ask aef Как снизить расходы на ГСМ?</code>\n"
+        "<code>/ask rcf Как набрать первую аудиторию в Telegram?</code>\n"
+        "<code>/ask agf Какой AI поможет обработать заявки?</code>\n\n"
+        "<b>Советы:</b>\n"
+        "✅ Указывай контекст — чем конкретнее вопрос, тем точнее ответ\n"
+        "✅ Кредит списывается только за успешный ответ\n\n"
+        "<b>Кредиты:</b>\n"
+        "🎁 5 — при регистрации\n"
+        "🎁 5 — за приглашение друга (/ref)\n"
+        "🎁 10 — другу при входе по твоей ссылке\n\n"
+        "По вопросам: @winnersd95"
+    )
 
 
 async def cmd_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -799,15 +912,7 @@ async def cmd_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
             parse_mode="HTML",
         )
     else:
-        await update.message.reply_text(
-            "<b>Доступные команды</b>\n\n"
-            "/balance — кредиты и реферальная ссылка\n"
-            "/ref — реферальная ссылка\n"
-            "/ask omf {вопрос} — AI-ассистент OmniMindFlow\n"
-            "/ask wef {вопрос} — AI-ассистент WinExtraFlow\n\n"
-            "Или нажми кнопку /start для меню.",
-            parse_mode="HTML",
-        )
+        await update.message.reply_text(_guide_text(), parse_mode="HTML")
 
 
 async def cmd_balance(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -907,8 +1012,9 @@ async def cmd_ask(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     project = context.args[0].lower()
-    if project not in ("omf", "wef", "aef"):
-        await update.message.reply_text("Проект должен быть omf, wef или aef")
+    valid = {"omf", "wef", "aef", "rcf", "agf"}
+    if project not in valid:
+        await update.message.reply_text("Проект: omf, wef, aef, rcf или agf")
         return
 
     question = " ".join(context.args[1:])
@@ -948,7 +1054,10 @@ async def cmd_ask(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # Read actual balance after deduction
         updated = _get_user(user.id)
         actual_credits = updated["credits"] if updated else user_data["credits"] - 1
-        project_label = "OmniMindFlow" if project == "omf" else "WinExtraFlow"
+        project_label = {
+            "omf": "OmniMindFlow", "wef": "WinExtraFlow", "aef": "AutoEvoFlow",
+            "rcf": "RiseCoreFlow", "agf": "AIGrowthFlow",
+        }.get(project, project.upper())
         await update.message.reply_text(
             f"<b>{project_label} AI</b>\n\n{answer}\n\n"
             f"<i>Кредиты: {actual_credits}</i>",
@@ -1102,6 +1211,72 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "Вопросы: <code>/ask aef {вопрос}</code>",
             parse_mode="HTML",
             reply_markup=_back_kb("menu:aef"),
+        )
+
+    elif data == "menu:rcf":
+        await query.edit_message_text(
+            "<b>🎯 RiseCoreFlow</b>\n\n"
+            "Платформа для развития личного бренда и карьеры в ИИ.\n"
+            "Позиционирование, контент-стратегия, рост аудитории.\n\n"
+            f"Кредиты: <b>{credits}</b>",
+            parse_mode="HTML",
+            reply_markup=_rcf_menu_kb(),
+        )
+
+    elif data == "menu:agf":
+        await query.edit_message_text(
+            "<b>🚀 AIGrowthFlow</b>\n\n"
+            "Маркетплейс ИИ-решений для российского бизнеса.\n"
+            "Подбор AI-инструментов, ROI автоматизации, внедрение под ключ.\n\n"
+            f"Кредиты: <b>{credits}</b>",
+            parse_mode="HTML",
+            reply_markup=_agf_menu_kb(),
+        )
+
+    elif data == "ask:rcf":
+        await query.edit_message_text(
+            "💬 <b>AI-ассистент RiseCoreFlow</b>\n\n"
+            f"Кредиты: <b>{credits}</b>\n\n"
+            "Задай вопрос командой:\n"
+            "<code>/ask rcf Как набрать первую аудиторию в Telegram?</code>",
+            parse_mode="HTML",
+            reply_markup=_back_kb("menu:rcf"),
+        )
+
+    elif data == "ask:agf":
+        await query.edit_message_text(
+            "💬 <b>AI-ассистент AIGrowthFlow</b>\n\n"
+            f"Кредиты: <b>{credits}</b>\n\n"
+            "Задай вопрос командой:\n"
+            "<code>/ask agf Какой AI поможет обработать заявки?</code>",
+            parse_mode="HTML",
+            reply_markup=_back_kb("menu:agf"),
+        )
+
+    elif data == "tips:rcf":
+        await query.edit_message_text(
+            "<b>🎯 Личный бренд в AI — советы</b>\n\n"
+            "1️⃣ Выбери нишу: узкая экспертиза бьёт широкую\n"
+            "2️⃣ Telegram-канал: 3 поста в неделю минимум\n"
+            "3️⃣ Кейсы > советы: показывай результаты, не рассуждения\n"
+            "4️⃣ Коллаборации: гостевые посты в смежных каналах\n"
+            "5️⃣ Лид-магнит: чек-лист или мини-курс для подписчиков\n\n"
+            "Вопросы: <code>/ask rcf {вопрос}</code>",
+            parse_mode="HTML",
+            reply_markup=_back_kb("menu:rcf"),
+        )
+
+    elif data == "tips:agf":
+        await query.edit_message_text(
+            "<b>🚀 AIGrowthFlow — как выбрать ИИ для бизнеса</b>\n\n"
+            "1️⃣ Опиши задачу: что повторяется ежедневно?\n"
+            "2️⃣ Считай ROI: время × ставка × количество = экономия\n"
+            "3️⃣ Начни с малого: один процесс, один инструмент\n"
+            "4️⃣ Тест без программистов: большинство ИИ-решений no-code\n"
+            "5️⃣ Масштаб: успешный кейс → внедряй в похожие процессы\n\n"
+            "Вопросы: <code>/ask agf {вопрос}</code>",
+            parse_mode="HTML",
+            reply_markup=_back_kb("menu:agf"),
         )
 
     elif data == "tips:omf":
@@ -1771,6 +1946,104 @@ async def auto_forward(update: Update, context: ContextTypes.DEFAULT_TYPE):
             logger.error("Auto-forward failed: %s", e)
 
 
+async def inline_query_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle @AIgrowthsbot <project> <question> inline queries in group chats."""
+    query_text = (update.inline_query.query or "").strip()
+    user = update.inline_query.from_user
+
+    project_names = {
+        "omf": "OmniMindFlow", "wef": "WinExtraFlow", "aef": "AutoEvoFlow",
+        "rcf": "RiseCoreFlow", "agf": "AIGrowthFlow",
+    }
+
+    if not query_text:
+        results = [
+            InlineQueryResultArticle(
+                id="help",
+                title="Как использовать бота в чате",
+                description="Введите: omf|wef|aef|rcf|agf <вопрос>",
+                input_message_content=InputTextMessageContent(
+                    "Синтаксис: @AIgrowthsbot <проект> <вопрос>\n\n"
+                    "Проекты: omf, wef, aef, rcf, agf\n"
+                    "Пример: @AIgrowthsbot omf Как автоматизировать стендап?"
+                ),
+            )
+        ]
+        await update.inline_query.answer(results, cache_time=30)
+        return
+
+    parts = query_text.split(None, 1)
+    project = parts[0].lower()
+    question = parts[1] if len(parts) > 1 else ""
+
+    if project not in project_names or not question:
+        results = [
+            InlineQueryResultArticle(
+                id="hint",
+                title="Введите: <проект> <вопрос>",
+                description="Проекты: omf, wef, aef, rcf, agf",
+                input_message_content=InputTextMessageContent(
+                    "Синтаксис: @AIgrowthsbot <проект> <вопрос>\n"
+                    "Пример: @AIgrowthsbot rcf Как набрать первую аудиторию?"
+                ),
+            )
+        ]
+        await update.inline_query.answer(results, cache_time=10)
+        return
+
+    user_data = _ensure_user(user)
+    credits = user_data["credits"]
+
+    if credits <= 0:
+        results = [
+            InlineQueryResultArticle(
+                id="no_credits",
+                title="Нет кредитов",
+                description="Пополни баланс через /ref или купи пакет",
+                input_message_content=InputTextMessageContent(
+                    f"У {user.first_name} нет кредитов для AI-запроса.\n"
+                    "Пополни баланс через личку боту: /ref или /balance"
+                ),
+            )
+        ]
+        await update.inline_query.answer(results, cache_time=5)
+        return
+
+    answer_text, backend, success, attempts = await _ask_ai(question, project)
+    _log_ai(user.id, project, question, backend, success, attempts)
+
+    if success:
+        _spend_credit(user.id)
+        _give_referral_reward(user.id)
+        updated = _get_user(user.id)
+        credits_left = updated["credits"] if updated else credits - 1
+        full_text = (
+            f"🤖 <b>{project_names[project]}</b>\n"
+            f"❓ {question[:80]}\n\n"
+            f"{answer_text}\n\n"
+            f"<i>Кредиты: {credits_left}</i>"
+        )
+    else:
+        full_text = (
+            f"🤖 <b>{project_names[project]}</b>\n"
+            f"❓ {question[:80]}\n\n"
+            "AI временно недоступен. Попробуй чуть позже."
+        )
+
+    results = [
+        InlineQueryResultArticle(
+            id="answer",
+            title=f"{project_names[project]}: {question[:50]}",
+            description=(answer_text if success else "AI недоступен")[:100],
+            input_message_content=InputTextMessageContent(
+                full_text,
+                parse_mode="HTML",
+            ),
+        )
+    ]
+    await update.inline_query.answer(results, cache_time=0)
+
+
 # ═══ MAIN ═════════════════════════════════════════════════════════════════════
 
 def main():
@@ -1819,6 +2092,7 @@ def main():
     app.add_handler(CommandHandler("aef", cmd_aef))
     app.add_handler(CommandHandler("ask", cmd_ask))
     app.add_handler(CallbackQueryHandler(callback_handler))
+    app.add_handler(InlineQueryHandler(inline_query_handler))
 
     # Admin / publishing handlers
     app.add_handler(CommandHandler("stats_ai", cmd_stats_ai))
@@ -1838,6 +2112,14 @@ def main():
 
     # Channel auto-forward
     app.add_handler(MessageHandler(filters.UpdateType.CHANNEL_POST, auto_forward))
+
+    # Guide: respond to help-seeking phrases
+    async def _guide_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        text = (update.message.text or "").lower()
+        if any(kw in text for kw in _GUIDE_KEYWORDS):
+            await update.message.reply_text(_guide_text(), parse_mode="HTML")
+
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, _guide_handler))
 
     # Catch-all: log any unhandled message for debugging
     async def _debug_catch_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
