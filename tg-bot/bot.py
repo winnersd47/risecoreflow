@@ -1947,101 +1947,91 @@ async def auto_forward(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def inline_query_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Handle @AIgrowthsbot <project> <question> inline queries in group chats."""
+    """Handle @AIgrowthsbot <project> <question> inline queries in group chats.
+
+    AI calls are intentionally NOT made here — Telegram inline queries time out
+    in ~5 s, which is faster than any AI provider round-trip.  Instead we post
+    a formatted question card to the chat and tell the user to continue in DM.
+    """
     query_text = (update.inline_query.query or "").strip()
-    user = update.inline_query.from_user
 
     project_names = {
-        "omf": "OmniMindFlow", "wef": "WinExtraFlow", "aef": "AutoEvoFlow",
-        "rcf": "RiseCoreFlow", "agf": "AIGrowthFlow",
+        "omf": ("OmniMindFlow", "🤖"), "wef": ("WinExtraFlow", "📈"),
+        "aef": ("AutoEvoFlow",  "🚗"), "rcf": ("RiseCoreFlow", "🎯"),
+        "agf": ("AIGrowthFlow", "🚀"),
     }
+    bot_username = _BOT_USERNAME or "AIgrowthsbot"
 
+    # Empty query — show project list
     if not query_text:
-        results = [
+        items = [
             InlineQueryResultArticle(
-                id="help",
-                title="Как использовать бота в чате",
-                description="Введите: omf|wef|aef|rcf|agf <вопрос>",
+                id=key,
+                title=f"{emoji} {name}",
+                description=f"@{bot_username} {key} <ваш вопрос>",
                 input_message_content=InputTextMessageContent(
-                    "Синтаксис: @AIgrowthsbot <проект> <вопрос>\n\n"
-                    "Проекты: omf, wef, aef, rcf, agf\n"
-                    "Пример: @AIgrowthsbot omf Как автоматизировать стендап?"
+                    f"{emoji} <b>{name} AI</b>\n\n"
+                    f"Задай вопрос в личке боту:\n"
+                    f"<code>/ask {key} ваш вопрос</code>\n\n"
+                    f"👉 @{bot_username}",
+                    parse_mode="HTML",
                 ),
             )
+            for key, (name, emoji) in project_names.items()
         ]
-        await update.inline_query.answer(results, cache_time=30)
+        await update.inline_query.answer(items, cache_time=60)
         return
 
     parts = query_text.split(None, 1)
     project = parts[0].lower()
     question = parts[1] if len(parts) > 1 else ""
 
-    if project not in project_names or not question:
-        results = [
-            InlineQueryResultArticle(
-                id="hint",
-                title="Введите: <проект> <вопрос>",
-                description="Проекты: omf, wef, aef, rcf, agf",
-                input_message_content=InputTextMessageContent(
-                    "Синтаксис: @AIgrowthsbot <проект> <вопрос>\n"
-                    "Пример: @AIgrowthsbot rcf Как набрать первую аудиторию?"
-                ),
-            )
-        ]
-        await update.inline_query.answer(results, cache_time=10)
-        return
-
-    user_data = _ensure_user(user)
-    credits = user_data["credits"]
-
-    if credits <= 0:
-        results = [
-            InlineQueryResultArticle(
-                id="no_credits",
-                title="Нет кредитов",
-                description="Пополни баланс через /ref или купи пакет",
-                input_message_content=InputTextMessageContent(
-                    f"У {user.first_name} нет кредитов для AI-запроса.\n"
-                    "Пополни баланс через личку боту: /ref или /balance"
-                ),
-            )
-        ]
-        await update.inline_query.answer(results, cache_time=5)
-        return
-
-    answer_text, backend, success, attempts = await _ask_ai(question, project)
-    _log_ai(user.id, project, question, backend, success, attempts)
-
-    if success:
-        _spend_credit(user.id)
-        _give_referral_reward(user.id)
-        updated = _get_user(user.id)
-        credits_left = updated["credits"] if updated else credits - 1
-        full_text = (
-            f"🤖 <b>{project_names[project]}</b>\n"
-            f"❓ {question[:80]}\n\n"
-            f"{answer_text}\n\n"
-            f"<i>Кредиты: {credits_left}</i>"
-        )
-    else:
-        full_text = (
-            f"🤖 <b>{project_names[project]}</b>\n"
-            f"❓ {question[:80]}\n\n"
-            "AI временно недоступен. Попробуй чуть позже."
-        )
-
-    results = [
-        InlineQueryResultArticle(
-            id="answer",
-            title=f"{project_names[project]}: {question[:50]}",
-            description=(answer_text if success else "AI недоступен")[:100],
+    # Unknown project or no question yet — hint
+    if project not in project_names:
+        hint = InlineQueryResultArticle(
+            id="hint",
+            title="Синтаксис: omf|wef|aef|rcf|agf <вопрос>",
+            description="Пример: rcf Как набрать первую аудиторию?",
             input_message_content=InputTextMessageContent(
-                full_text,
+                f"@{bot_username}: omf | wef | aef | rcf | agf <вопрос>"
+            ),
+        )
+        await update.inline_query.answer([hint], cache_time=5)
+        return
+
+    name, emoji = project_names[project]
+
+    if not question:
+        # Project chosen, waiting for question text
+        prompt = InlineQueryResultArticle(
+            id="typing",
+            title=f"{emoji} {name} — введите вопрос",
+            description="Например: Как набрать первую аудиторию в Telegram?",
+            input_message_content=InputTextMessageContent(
+                f"{emoji} <b>{name} AI</b>\n\n"
+                f"Задай вопрос боту:\n"
+                f"<code>/ask {project} ваш вопрос</code>\n\n"
+                f"👉 @{bot_username}",
                 parse_mode="HTML",
             ),
         )
-    ]
-    await update.inline_query.answer(results, cache_time=0)
+        await update.inline_query.answer([prompt], cache_time=0)
+        return
+
+    # Full query: post question card to chat, answer comes in DM
+    card_text = (
+        f"{emoji} <b>{name} AI</b>\n"
+        f"❓ {question[:200]}\n\n"
+        f"💬 Ответ — в личке: <code>/ask {project} {question[:100]}</code>\n"
+        f"👉 @{bot_username}"
+    )
+    result = InlineQueryResultArticle(
+        id="card",
+        title=f"{emoji} Спросить {name} AI",
+        description=question[:100],
+        input_message_content=InputTextMessageContent(card_text, parse_mode="HTML"),
+    )
+    await update.inline_query.answer([result], cache_time=0)
 
 
 # ═══ MAIN ═════════════════════════════════════════════════════════════════════
