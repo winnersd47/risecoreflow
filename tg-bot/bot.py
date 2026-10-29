@@ -36,7 +36,7 @@ import time
 from pathlib import Path
 
 from dotenv import load_dotenv
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, LabeledPrice
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, LabeledPrice, InlineQueryResultsButton
 from telegram.ext import (
     Application, CommandHandler, MessageHandler,
     CallbackQueryHandler, PreCheckoutQueryHandler, InlineQueryHandler,
@@ -98,6 +98,10 @@ CREDIT_PACKAGES = [
 
 # Module-level bot username cache — filled once in main()
 _BOT_USERNAME: str = ""
+
+# Temporary inline→DM handoff store: {token: (project, question)}
+# Token is 8 hex chars (fits Telegram's 64-char start_parameter limit).
+_inline_sessions: dict[str, tuple[str, str]] = {}
 
 
 # ═══ OMNIMINDFLOW CONTENT (Wave 1) ═══════════════════════════════════════════
@@ -825,7 +829,56 @@ async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     print(f"CMD_START called by {update.effective_user.id}", flush=True)
     logger.info("CMD_START: user=%s", update.effective_user.id)
     user = update.effective_user
-    referred_by = context.args[0] if context.args else None
+    arg = context.args[0] if context.args else None
+
+    # ── Inline→DM handoff: token from InlineQueryResultsButton ──────────────
+    if arg and arg in _inline_sessions:
+        project, question = _inline_sessions.pop(arg)
+        user_data = _ensure_user(user)
+        if user_data["credits"] <= 0:
+            await update.message.reply_text(
+                "❌ <b>Нет кредитов</b>\n\nПополни через /ref или купи пакет.",
+                parse_mode="HTML",
+            )
+            return
+        await context.bot.send_chat_action(chat_id=update.effective_chat.id, action="typing")
+        answer, backend, success, attempts = await _ask_ai(question, project)
+        _log_ai(user.id, project, question, backend, success, attempts)
+        pnames = {
+            "omf": "OmniMindFlow", "wef": "WinExtraFlow", "aef": "AutoEvoFlow",
+            "rcf": "RiseCoreFlow",  "agf": "AIGrowthFlow",
+        }
+        label = pnames.get(project, project.upper())
+        if success:
+            _spend_credit(user.id)
+            _give_referral_reward(user.id)
+            updated = _get_user(user.id)
+            cr = updated["credits"] if updated else user_data["credits"] - 1
+            await update.message.reply_text(
+                f"<b>{label} AI</b>\n\n{answer}\n\n<i>Кредиты: {cr}</i>",
+                parse_mode="HTML",
+            )
+        else:
+            await update.message.reply_text(
+                f"<b>{label} AI</b>\n\nAI временно недоступен. Попробуй позже.\n\n"
+                f"<code>/ask {project} {question}</code>",
+                parse_mode="HTML",
+            )
+        return
+
+    # ── menu_<project> from inline button (no question) ─────────────────────
+    if arg and arg.startswith("menu_"):
+        project = arg[5:]
+        _ensure_user(user)
+        await update.message.reply_text(
+            f"Задай вопрос командой:\n<code>/ask {project} ваш вопрос</code>",
+            parse_mode="HTML",
+            reply_markup=_main_menu_kb(),
+        )
+        return
+
+    # ── Normal /start ────────────────────────────────────────────────────────
+    referred_by = arg
     is_new = _get_user(user.id) is None
     user_data = _ensure_user(user, referred_by=referred_by if is_new else None)
     credits = user_data["credits"]
@@ -1949,9 +2002,9 @@ async def auto_forward(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def inline_query_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle @AIgrowthsbot <project> <question> inline queries in group chats.
 
-    AI calls are intentionally NOT made here — Telegram inline queries time out
-    in ~5 s, which is faster than any AI provider round-trip.  Instead we post
-    a formatted question card to the chat and tell the user to continue in DM.
+    Nothing is posted to the group chat. Instead a "Answer privately →" button
+    redirects the user to the bot DM via a short-lived token that carries the
+    project + question. cmd_start picks it up and runs the AI call privately.
     """
     query_text = (update.inline_query.query or "").strip()
 
@@ -1960,78 +2013,35 @@ async def inline_query_handler(update: Update, context: ContextTypes.DEFAULT_TYP
         "aef": ("AutoEvoFlow",  "🚗"), "rcf": ("RiseCoreFlow", "🎯"),
         "agf": ("AIGrowthFlow", "🚀"),
     }
-    bot_username = _BOT_USERNAME or "AIgrowthsbot"
-
-    # Empty query — show project list
-    if not query_text:
-        items = [
-            InlineQueryResultArticle(
-                id=key,
-                title=f"{emoji} {name}",
-                description=f"@{bot_username} {key} <ваш вопрос>",
-                input_message_content=InputTextMessageContent(
-                    f"{emoji} <b>{name} AI</b>\n\n"
-                    f"Задай вопрос в личке боту:\n"
-                    f"<code>/ask {key} ваш вопрос</code>\n\n"
-                    f"👉 @{bot_username}",
-                    parse_mode="HTML",
-                ),
-            )
-            for key, (name, emoji) in project_names.items()
-        ]
-        await update.inline_query.answer(items, cache_time=60)
-        return
 
     parts = query_text.split(None, 1)
-    project = parts[0].lower()
-    question = parts[1] if len(parts) > 1 else ""
+    project = parts[0].lower() if parts else ""
+    question = parts[1].strip() if len(parts) > 1 else ""
 
-    # Unknown project or no question yet — hint
-    if project not in project_names:
-        hint = InlineQueryResultArticle(
-            id="hint",
-            title="Синтаксис: omf|wef|aef|rcf|agf <вопрос>",
-            description="Пример: rcf Как набрать первую аудиторию?",
-            input_message_content=InputTextMessageContent(
-                f"@{bot_username}: omf | wef | aef | rcf | agf <вопрос>"
-            ),
-        )
-        await update.inline_query.answer([hint], cache_time=5)
-        return
+    # Determine button label and start_parameter
+    if project in project_names and question:
+        name, emoji = project_names[project]
+        # Store question; keep store bounded at 200 entries
+        token = secrets.token_hex(4)  # 8 chars — fits 64-char limit
+        _inline_sessions[token] = (project, question)
+        if len(_inline_sessions) > 200:
+            _inline_sessions.pop(next(iter(_inline_sessions)))
+        btn_text = f"Спросить {emoji} {name} AI в личке →"
+        start_param = token
+    elif project in project_names:
+        name, emoji = project_names[project]
+        btn_text = f"Открыть {emoji} {name} в личке →"
+        start_param = f"menu_{project}"
+    else:
+        btn_text = "Открыть AIGrowth AI в личке →"
+        start_param = "menu"
 
-    name, emoji = project_names[project]
-
-    if not question:
-        # Project chosen, waiting for question text
-        prompt = InlineQueryResultArticle(
-            id="typing",
-            title=f"{emoji} {name} — введите вопрос",
-            description="Например: Как набрать первую аудиторию в Telegram?",
-            input_message_content=InputTextMessageContent(
-                f"{emoji} <b>{name} AI</b>\n\n"
-                f"Задай вопрос боту:\n"
-                f"<code>/ask {project} ваш вопрос</code>\n\n"
-                f"👉 @{bot_username}",
-                parse_mode="HTML",
-            ),
-        )
-        await update.inline_query.answer([prompt], cache_time=0)
-        return
-
-    # Full query: post question card to chat, answer comes in DM
-    card_text = (
-        f"{emoji} <b>{name} AI</b>\n"
-        f"❓ {question[:200]}\n\n"
-        f"💬 Ответ — в личке: <code>/ask {project} {question[:100]}</code>\n"
-        f"👉 @{bot_username}"
+    await update.inline_query.answer(
+        results=[],  # no message posted to group
+        button=InlineQueryResultsButton(text=btn_text, start_parameter=start_param),
+        cache_time=0,
+        is_personal=True,
     )
-    result = InlineQueryResultArticle(
-        id="card",
-        title=f"{emoji} Спросить {name} AI",
-        description=question[:100],
-        input_message_content=InputTextMessageContent(card_text, parse_mode="HTML"),
-    )
-    await update.inline_query.answer([result], cache_time=0)
 
 
 # ═══ MAIN ═════════════════════════════════════════════════════════════════════
