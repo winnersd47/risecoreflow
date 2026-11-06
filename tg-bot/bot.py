@@ -48,6 +48,17 @@ load_dotenv()
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger(__name__)
 
+# ── Knowledge Base (knowledge_base/ в корне RiseCoreFlow) ────────────────────
+import sys as _sys
+_sys.path.insert(0, str(Path(__file__).parent.parent))
+try:
+    from knowledge_base.search import search_kb_async as _search_kb
+    _KB_ENABLED = True
+    logger.info("Knowledge base: enabled")
+except Exception as _kb_import_err:
+    _KB_ENABLED = False
+    logger.info("Knowledge base: disabled (%s) — запустите knowledge_base/update_kb.py", _kb_import_err)
+
 # ── Core config ────────────────────────────────────────────────────────────────
 BOT_TOKEN = os.getenv("BOT_TOKEN", "")
 DB_PATH = Path(__file__).parent.parent / "dev.db"
@@ -86,6 +97,10 @@ CREDITS_SIGNUP = 5
 CREDITS_REF_BONUS = 5    # new user gets +5 when joining via referral
 CREDITS_REF_REWARD = 10  # referrer gets +10 on referred user's first successful AI call
 
+# Marketing constants
+PREMIUM_PRICE_RUB = 2490   # price anchor shown to new users
+FREE_SLOTS_TOTAL  = 500    # shown in scarcity message (static, no real tracking needed)
+
 # YooKassa payment token (from @BotFather → Payments → YooKassa)
 YOOKASSA_PAYMENT_TOKEN = os.getenv("YOOKASSA_PAYMENT_TOKEN", "")
 
@@ -98,6 +113,24 @@ CREDIT_PACKAGES = [
 
 # Module-level bot username cache — filled once in main()
 _BOT_USERNAME: str = ""
+
+
+# ─── Marketing helpers ────────────────────────────────────────────────────────
+
+def _quota_id(user_id: int) -> str:
+    """Deterministic personal quota number — looks unique, never collides in practice."""
+    return f"{str(user_id)[-4:]}-2026"
+
+
+def _member_number(user_id: int) -> int:
+    """Stable 'member number' derived from user_id. Gives sequential feel."""
+    return 1000 + (user_id % 7000)
+
+
+def _slots_taken(user_id: int) -> int:
+    """How many of FREE_SLOTS_TOTAL slots appear taken. Deterministic per user so it
+    looks personalised: same user always sees the same number."""
+    return FREE_SLOTS_TOTAL - 7 - (user_id % 40)
 
 # Temporary inline→DM handoff store: {token: (project, question)}
 # Token is 8 hex chars (fits Telegram's 64-char start_parameter limit).
@@ -462,6 +495,16 @@ async def _ask_ai(question: str, project: str = "omf") -> tuple[str, str, bool, 
     system = _AI_CONTEXTS.get(project, _AI_CONTEXTS["omf"])
     ssl = not SKIP_SSL_VERIFY
 
+    # ── Knowledge Base: обогащаем вопрос свежим контекстом из @oqode ──────────
+    if _KB_ENABLED:
+        try:
+            kb_ctx = await _search_kb(question)
+            if kb_ctx:
+                question = kb_ctx + "\n" + question
+                logger.debug("KB context injected (%d chars)", len(kb_ctx))
+        except Exception as _kb_e:
+            logger.debug("KB search skipped: %s", _kb_e)
+
     # 1. Anthropic Claude (preferred)
     api_key = os.getenv("ANTHROPIC_API_KEY", "")
     if api_key:
@@ -673,8 +716,11 @@ def _main_menu_kb() -> InlineKeyboardMarkup:
             InlineKeyboardButton("🚀 AIGrowthFlow", callback_data="menu:agf"),
         ],
         [
-            InlineKeyboardButton("💰 Мой баланс", callback_data="menu:balance"),
-            InlineKeyboardButton("👥 Реферальная", callback_data="menu:ref"),
+            InlineKeyboardButton("💰 Мой баланс",   callback_data="menu:balance"),
+            InlineKeyboardButton("👥 Пригласить",    callback_data="menu:ref"),
+        ],
+        [
+            InlineKeyboardButton("📋 Мой статус",   callback_data="menu:status"),
         ],
     ])
 
@@ -836,9 +882,17 @@ async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         project, question = _inline_sessions.pop(arg)
         user_data = _ensure_user(user)
         if user_data["credits"] <= 0:
+            ref_link = _ref_link(user_data["ref_code"])
             await update.message.reply_text(
-                "❌ <b>Нет кредитов</b>\n\nПополни через /ref или купи пакет.",
+                f"⚠️ <b>Кредиты закончились</b>\n\n"
+                f"Пригласи одного человека — он получит бесплатный доступ "
+                f"(обычно <s>{PREMIUM_PRICE_RUB}₽/мес</s>), ты получишь "
+                f"+{CREDITS_REF_REWARD} кредитов.\n\n"
+                f"<code>{ref_link}</code>",
                 parse_mode="HTML",
+                reply_markup=InlineKeyboardMarkup([[
+                    InlineKeyboardButton("👥 Поделиться ссылкой", url=ref_link),
+                ]]),
             )
             return
         await context.bot.send_chat_action(chat_id=update.effective_chat.id, action="typing")
@@ -884,25 +938,31 @@ async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     credits = user_data["credits"]
 
     if is_new:
-        bonus_note = (
-            f"\n\n🎁 <b>+{CREDITS_REF_BONUS} бонусных кредитов</b> за приглашение!"
+        quota = _quota_id(user.id)
+        num   = _member_number(user.id)
+        taken = _slots_taken(user.id)
+        ref_bonus_line = (
+            f"\n🎁 <b>+{CREDITS_REF_BONUS} кредитов</b> начислено — тебя пригласил участник."
             if referred_by else ""
         )
         text = (
-            f"Привет, {user.first_name}! 👋\n\n"
-            f"<b>AIGrowth Bot</b> — твой AI-помощник для 5 проектов:\n"
-            f"• 🤖 OmniMindFlow — AI OS для работы\n"
-            f"• 📈 WinExtraFlow — анализ торговых сигналов\n"
-            f"• 🚗 AutoEvoFlow — оптимизация автопарка\n"
-            f"• 🎯 RiseCoreFlow — личный бренд в AI\n"
-            f"• 🚀 AIGrowthFlow — маркетплейс ИИ-решений\n\n"
-            f"🎉 Тебе начислено <b>{credits} кредитов</b> — это бесплатные AI-запросы.{bonus_note}\n\n"
-            f"Выбери проект:"
+            f"✅ <b>Доступ подтверждён. Квота #{quota}</b>\n\n"
+            f"Привет, {user.first_name}! Ты в числе первых.\n\n"
+            f"<b>AIGrowth Bot</b> — 5 AI-ассистентов в одном месте:\n"
+            f"• 🤖 OmniMindFlow — AI OS, автоматизация рутины\n"
+            f"• 📈 WinExtraFlow — оценка торговых сигналов\n"
+            f"• 🚗 AutoEvoFlow — аналитика автопарка\n"
+            f"• 🎯 RiseCoreFlow — личный бренд в ИИ\n"
+            f"• 🚀 AIGrowthFlow — ИИ-решения для бизнеса\n\n"
+            f"Обычно Premium стоит <s>{PREMIUM_PRICE_RUB}₽/мес</s> — "
+            f"тебе открыт <b>бесплатный доступ</b> на {credits} запросов.{ref_bonus_line}\n\n"
+            f"⚠️ Занято {taken} из {FREE_SLOTS_TOTAL} мест. Твой номер: <b>#{num}</b>.\n\n"
+            f"Выбери, с чего начать:"
         )
     else:
         text = (
             f"С возвращением, {user.first_name}!\n\n"
-            f"Кредиты: <b>{credits}</b>\n\n"
+            f"Кредиты: <b>{credits}</b> · Квота: <b>#{_quota_id(user.id)}</b>\n\n"
             f"Выбери проект:"
         )
     await update.message.reply_text(text, parse_mode="HTML", reply_markup=_main_menu_kb())
@@ -972,14 +1032,24 @@ async def cmd_balance(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     user_data = _ensure_user(user)
     ref_link = _ref_link(user_data["ref_code"])
+    credits = user_data["credits"]
+    status_line = (
+        f"🟢 Доступ активен — {credits} запросов осталось"
+        if credits > 0
+        else f"🔴 Кредиты закончились — пригласи друга"
+    )
     await update.message.reply_text(
-        f"<b>Твой баланс</b>\n\n"
-        f"Кредиты: <b>{user_data['credits']}</b>\n"
-        f"1 кредит = 1 успешный AI-запрос\n\n"
-        f"Пополнить: приглашай друзей\n\n"
-        f"Реферальная ссылка:\n<code>{ref_link}</code>\n"
-        f"(+{CREDITS_REF_BONUS} другу, +{CREDITS_REF_REWARD} тебе за его первый запрос)",
+        f"<b>💳 Баланс · Квота #{_quota_id(user.id)}</b>\n\n"
+        f"Кредиты: <b>{credits}</b>\n"
+        f"{status_line}\n\n"
+        f"<b>Как получить ещё:</b>\n"
+        f"Пригласи друга — он получит бесплатный доступ "
+        f"(обычно <s>{PREMIUM_PRICE_RUB}₽/мес</s>), ты получишь <b>+{CREDITS_REF_REWARD} кредитов</b>.\n\n"
+        f"Твоя ссылка:\n<code>{ref_link}</code>",
         parse_mode="HTML",
+        reply_markup=InlineKeyboardMarkup([[
+            InlineKeyboardButton("👥 Поделиться ссылкой", url=ref_link),
+        ]]),
     )
 
 
@@ -988,13 +1058,19 @@ async def cmd_ref(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_data = _ensure_user(user)
     ref_link = _ref_link(user_data["ref_code"])
     await update.message.reply_text(
-        f"<b>Реферальная программа</b>\n\n"
+        f"<b>👥 Пригласи — получи кредиты</b>\n\n"
         f"Твоя ссылка:\n<code>{ref_link}</code>\n\n"
-        f"• Друг получает +{CREDITS_REF_BONUS} кредитов при старте\n"
-        f"• Ты получаешь +{CREDITS_REF_REWARD} кредитов когда\n"
-        f"  друг сделает первый AI-запрос\n\n"
+        f"Что получает друг:\n"
+        f"• {CREDITS_SIGNUP + CREDITS_REF_BONUS} кредитов бесплатно "
+        f"(доступ, который обычно стоит <s>{PREMIUM_PRICE_RUB}₽/мес</s>)\n\n"
+        f"Что получаешь ты:\n"
+        f"• +{CREDITS_REF_REWARD} кредитов — сразу после его первого AI-запроса\n\n"
+        f"Пока бесплатные места ещё есть — поделись сейчас.\n\n"
         f"Код: <code>{user_data['ref_code']}</code>",
         parse_mode="HTML",
+        reply_markup=InlineKeyboardMarkup([[
+            InlineKeyboardButton("📤 Поделиться ссылкой", url=ref_link),
+        ]]),
     )
 
 
@@ -1076,10 +1152,17 @@ async def cmd_ask(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if user_data["credits"] <= 0:
         ref_link = _ref_link(user_data["ref_code"])
         await update.message.reply_text(
-            "❌ <b>Нет кредитов</b>\n\n"
-            "Пригласи друга и получи +10 кредитов:\n"
-            f"<code>{ref_link}</code>",
+            f"⚠️ <b>Кредиты исчерпаны</b>\n\n"
+            f"Бесплатных запросов больше нет — ты использовал все {CREDITS_SIGNUP}.\n\n"
+            f"<b>Это не для тех, кто просто смотрит.</b> Если хочешь продолжить — "
+            f"пригласи одного человека и получи +{CREDITS_REF_REWARD} кредитов сразу:\n\n"
+            f"<code>{ref_link}</code>\n\n"
+            f"Друг получит +{CREDITS_REF_BONUS} кредитов (обычно {PREMIUM_PRICE_RUB}₽/мес — бесплатно).\n\n"
+            f"<i>Не хочешь — закрой бота. Хочешь продолжать — жми ниже.</i>",
             parse_mode="HTML",
+            reply_markup=InlineKeyboardMarkup([[
+                InlineKeyboardButton("👥 Поделиться ссылкой", url=ref_link),
+            ]]),
         )
         return
 
@@ -1121,9 +1204,11 @@ async def cmd_ask(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await context.bot.send_message(
                     chat_id=int(referrer_id),
                     text=(
-                        f"🎉 Твой приглашённый сделал первый AI-запрос — "
-                        f"тебе начислено +{CREDITS_REF_REWARD} кредитов!"
+                        f"🎉 <b>+{CREDITS_REF_REWARD} кредитов начислено!</b>\n\n"
+                        f"Твой приглашённый сделал первый AI-запрос.\n"
+                        f"Продолжай — каждый следующий друг даёт ещё +{CREDITS_REF_REWARD} кредитов."
                     ),
+                    parse_mode="HTML",
                 )
             except Exception:
                 pass
@@ -1182,15 +1267,23 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     elif data == "menu:balance":
         ref_link = _ref_link(ref_code)
+        status_line = (
+            f"🟢 Активен — осталось {credits} запросов"
+            if credits > 0
+            else "🔴 Кредиты закончились"
+        )
         buy_btn = InlineKeyboardButton("💳 Купить кредиты", callback_data="menu:buy")
         await query.edit_message_text(
-            f"<b>Баланс</b>\n\n"
+            f"<b>💳 Баланс · Квота #{_quota_id(user.id)}</b>\n\n"
             f"Кредиты: <b>{credits}</b>\n"
-            f"1 кредит = 1 успешный AI-запрос\n\n"
-            f"Реферальная ссылка:\n<code>{ref_link}</code>\n"
-            f"(+{CREDITS_REF_BONUS} другу, +{CREDITS_REF_REWARD} тебе за его первый запрос)",
+            f"{status_line}\n\n"
+            f"Пригласи друга — он получит бесплатный доступ "
+            f"(обычно <s>{PREMIUM_PRICE_RUB}₽/мес</s>),\n"
+            f"ты получишь <b>+{CREDITS_REF_REWARD} кредитов</b>:\n\n"
+            f"<code>{ref_link}</code>",
             parse_mode="HTML",
             reply_markup=InlineKeyboardMarkup([
+                [InlineKeyboardButton("👥 Поделиться ссылкой", url=ref_link)],
                 [buy_btn],
                 [InlineKeyboardButton("◀️ Назад", callback_data="menu:main")],
             ]),
@@ -1217,13 +1310,44 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif data == "menu:ref":
         ref_link = _ref_link(ref_code)
         await query.edit_message_text(
-            f"<b>Реферальная программа</b>\n\n"
+            f"<b>👥 Пригласи друга — получи кредиты</b>\n\n"
             f"Твоя ссылка:\n<code>{ref_link}</code>\n\n"
-            f"• Друг: +{CREDITS_REF_BONUS} кредитов при регистрации\n"
-            f"• Ты: +{CREDITS_REF_REWARD} кредитов за его первый AI-запрос\n\n"
-            f"Код: <code>{ref_code}</code>",
+            f"Что получает друг:\n"
+            f"• +{CREDITS_REF_BONUS} кредитов сразу (обычно {PREMIUM_PRICE_RUB}₽/мес — бесплатно)\n\n"
+            f"Что получаешь ты:\n"
+            f"• +{CREDITS_REF_REWARD} кредитов после его первого AI-запроса\n\n"
+            f"Код: <code>{ref_code}</code>\n\n"
+            f"<i>Пока не поздно — бесплатные места ещё есть.</i>",
             parse_mode="HTML",
             reply_markup=_back_kb(),
+        )
+
+    elif data == "menu:status":
+        from datetime import datetime, timezone
+        quota = _quota_id(user.id)
+        num   = _member_number(user.id)
+        taken = _slots_taken(user.id)
+        today = datetime.now(timezone.utc).strftime("%d.%m.%Y")
+        status_icon = "🟢" if credits > 0 else "🔴"
+        await query.edit_message_text(
+            f"<b>📋 Протокол доступа #{quota}</b>\n\n"
+            f"Участник: <b>#{num}</b>\n"
+            f"Дата: {today}\n"
+            f"Статус: {status_icon} {'Активен' if credits > 0 else 'Нет кредитов'}\n"
+            f"Кредиты: <b>{credits}</b>\n\n"
+            f"<b>Что тебе открыто:</b>\n"
+            f"✅ OmniMindFlow AI — автоматизация работы\n"
+            f"✅ WinExtraFlow AI — оценка сигналов\n"
+            f"✅ AutoEvoFlow AI — аналитика парка\n"
+            f"✅ RiseCoreFlow AI — личный бренд\n"
+            f"✅ AIGrowthFlow AI — ИИ для бизнеса\n\n"
+            f"Занято мест: <b>{taken} из {FREE_SLOTS_TOTAL}</b>\n\n"
+            f"<i>Чтобы не потерять доступ — поддерживай кредиты.</i>",
+            parse_mode="HTML",
+            reply_markup=InlineKeyboardMarkup([
+                [InlineKeyboardButton("👥 Пригласить → +кредиты", callback_data="menu:ref")],
+                [InlineKeyboardButton("◀️ Главное меню", callback_data="menu:main")],
+            ]),
         )
 
     elif data == "ask:omf":

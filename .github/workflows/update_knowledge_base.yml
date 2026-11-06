@@ -1,0 +1,90 @@
+name: Update Knowledge Base
+
+# Автоматическое обновление живой базы знаний из @oqode каждые 4 часа.
+# Результат (knowledge.db) коммитится обратно в репо.
+# Бот подхватывает обновлённую базу при следующем перезапуске.
+
+on:
+  schedule:
+    - cron: '0 */4 * * *'   # каждые 4 часа
+  workflow_dispatch:          # ручной запуск через GitHub UI
+
+permissions:
+  contents: write             # нужно для git push
+
+env:
+  PYTHONPATH: ${{ github.workspace }}
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      # ── 1. Checkout ──────────────────────────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      # ── 2. Python ────────────────────────────────────────────────────────────
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: knowledge_base/requirements.txt
+
+      - name: Install dependencies
+        run: pip install telethon requests python-dotenv pysocks
+
+      # ── 3. Восстановить Telegram-сессию из секрета ───────────────────────────
+      # Первый раз: запустить knowledge_base/generate_session.py локально,
+      # получить base64 строку и сохранить как GitHub Secret KB_TG_SESSION_B64.
+      - name: Restore Telegram session
+        env:
+          KB_TG_SESSION_B64: ${{ secrets.KB_TG_SESSION_B64 }}
+        run: |
+          python - <<'PYEOF'
+          import base64, os
+          from pathlib import Path
+          d = Path("knowledge_base/data")
+          d.mkdir(parents=True, exist_ok=True)
+          raw = os.environ.get("KB_TG_SESSION_B64", "")
+          if not raw:
+              print("::error ::Секрет KB_TG_SESSION_B64 не задан — запустите generate_session.py локально")
+              raise SystemExit(1)
+          (d / "kb_fetcher.session").write_bytes(base64.b64decode(raw))
+          print(f"Session restored ({len(base64.b64decode(raw))} bytes)")
+          PYEOF
+
+      # ── 4. Запустить обновление базы ─────────────────────────────────────────
+      - name: Update knowledge base
+        env:
+          TELEGRAM_API_ID:   ${{ secrets.KB_TG_API_ID }}
+          TELEGRAM_API_HASH: ${{ secrets.KB_TG_API_HASH }}
+          YANDEX_API_KEY:    ${{ secrets.YANDEX_API_KEY }}
+          YANDEX_FOLDER_ID:  ${{ secrets.YANDEX_FOLDER_ID }}
+          # Прокси не нужен из GitHub Actions — прямое подключение к Telegram
+          SOCKS5_HOST:       ""
+          SKIP_SSL_VERIFY:   "false"
+        run: python -m knowledge_base.update_kb
+
+      # ── 5. Коммитим обновлённую базу ─────────────────────────────────────────
+      - name: Commit knowledge.db if updated
+        run: |
+          git config user.name  "kb-bot[bot]"
+          git config user.email "kb-bot@users.noreply.github.com"
+          git add knowledge_base/data/knowledge.db
+          if git diff --staged --quiet; then
+            echo "No new data — skipping commit"
+          else
+            COUNT=$(python -c "
+          import sqlite3, sys
+          db = 'knowledge_base/data/knowledge.db'
+          n = sqlite3.connect(db).execute('SELECT COUNT(*) FROM posts').fetchone()[0]
+          print(n)
+          " 2>/dev/null || echo "?")
+            git commit -m "data(kb): обновление базы знаний — ${COUNT} постов [skip ci]"
+            git push
+          fi

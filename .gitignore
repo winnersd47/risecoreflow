@@ -41,3 +41,8 @@ yarn-error.log*
 next-env.d.ts
 
 /app/generated/prisma
+
+# Knowledge Base — session и кэш (не коммитить)
+knowledge_base/data/*.session
+knowledge_base/data/__pycache__/
+# knowledge.db коммитируется (живая база знаний для CI/бота)
