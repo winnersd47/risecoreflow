@@ -1,10 +1,12 @@
 /**
  * Universal AI Engine
- * Priority: Gemini (free) → Claude (paid) → Mock (no key)
+ * Priority: Gemini (free) → YandexGPT (free) → DeepSeek (paid) → Claude (paid) → Mock (no key)
  *
  * To activate:
- *   Gemini FREE: https://aistudio.google.com → Get API key → paste in .env
- *   Claude paid:  https://console.anthropic.com → paste in .env
+ *   Gemini FREE:    https://aistudio.google.com → Get API key → paste in .env as GEMINI_API_KEY
+ *   YandexGPT FREE: Yandex Cloud → IAM key → YANDEX_API_KEY + YANDEX_FOLDER_ID
+ *   DeepSeek PAID:  https://platform.deepseek.com → DEEPSEEK_API_KEY (~$0.14/1M tokens)
+ *   Claude PAID:    https://console.anthropic.com → ANTHROPIC_API_KEY
  */
 
 import https from "https";
@@ -110,6 +112,53 @@ function runYandexGPT(prompt: string): Promise<string> {
   });
 }
 
+// ─── DeepSeek Chat (PAID, бизнес-аналитика) ───────────────────────────────────
+function runDeepSeek(prompt: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const body = JSON.stringify({
+      model: "deepseek-chat",
+      messages: [
+        { role: "system", content: SYSTEM_PROMPT },
+        { role: "user", content: prompt },
+      ],
+      temperature: 0.7,
+      max_tokens: 1500,
+    });
+
+    const req = https.request(
+      {
+        hostname: "api.deepseek.com",
+        path: "/v1/chat/completions",
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${process.env.DEEPSEEK_API_KEY}`,
+          "Content-Type": "application/json",
+          "Content-Length": Buffer.byteLength(body),
+        },
+        rejectUnauthorized: false,
+      },
+      (res) => {
+        let raw = "";
+        res.on("data", (chunk) => { raw += chunk; });
+        res.on("end", () => {
+          try {
+            if (res.statusCode && res.statusCode >= 400) {
+              reject(new Error(`DeepSeek ${res.statusCode}: ${raw}`));
+              return;
+            }
+            const data = JSON.parse(raw);
+            resolve(data.choices[0].message.content);
+          } catch (e) { reject(e); }
+        });
+      }
+    );
+
+    req.on("error", reject);
+    req.write(body);
+    req.end();
+  });
+}
+
 // ─── Claude (PAID fallback) ────────────────────────────────────────────────────
 async function runClaude(prompt: string): Promise<string> {
   const Anthropic = (await import("@anthropic-ai/sdk")).default;
@@ -131,19 +180,22 @@ function runMock(prompt: string): string {
 
 // ─── Auto-select engine ────────────────────────────────────────────────────────
 export async function generate(prompt: string): Promise<string> {
-  const hasGemini  = !!process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY !== "your-gemini-key-here";
-  const hasYandex  = !!process.env.YANDEX_API_KEY && !!process.env.YANDEX_FOLDER_ID;
-  const hasClaude  = !!process.env.ANTHROPIC_API_KEY && process.env.ANTHROPIC_API_KEY !== "your-anthropic-key-here";
+  const hasGemini   = !!process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY !== "your-gemini-key-here";
+  const hasYandex   = !!process.env.YANDEX_API_KEY && !!process.env.YANDEX_FOLDER_ID;
+  const hasDeepSeek = !!process.env.DEEPSEEK_API_KEY && process.env.DEEPSEEK_API_KEY !== "your-deepseek-key-here";
+  const hasClaude   = !!process.env.ANTHROPIC_API_KEY && process.env.ANTHROPIC_API_KEY !== "your-anthropic-key-here";
 
-  if (hasGemini) try { return await runGemini(prompt);    } catch (e) { console.error("[AI] Gemini failed:", e) }
-  if (hasYandex) try { return await runYandexGPT(prompt); } catch (e) { console.error("[AI] YandexGPT failed:", e) }
-  if (hasClaude) try { return await runClaude(prompt);    } catch (e) { console.error("[AI] Claude failed:", e) }
+  if (hasGemini)   try { return await runGemini(prompt);    } catch (e) { console.error("[AI] Gemini failed:", e) }
+  if (hasYandex)   try { return await runYandexGPT(prompt); } catch (e) { console.error("[AI] YandexGPT failed:", e) }
+  if (hasDeepSeek) try { return await runDeepSeek(prompt);  } catch (e) { console.error("[AI] DeepSeek failed:", e) }
+  if (hasClaude)   try { return await runClaude(prompt);    } catch (e) { console.error("[AI] Claude failed:", e) }
   return runMock(prompt);
 }
 
-export function getActiveEngine(): "gemini" | "yandex" | "claude" | "none" {
+export function getActiveEngine(): "gemini" | "yandex" | "deepseek" | "claude" | "none" {
   if (!!process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY !== "your-gemini-key-here") return "gemini";
   if (!!process.env.YANDEX_API_KEY && !!process.env.YANDEX_FOLDER_ID) return "yandex";
+  if (!!process.env.DEEPSEEK_API_KEY && process.env.DEEPSEEK_API_KEY !== "your-deepseek-key-here") return "deepseek";
   if (!!process.env.ANTHROPIC_API_KEY && process.env.ANTHROPIC_API_KEY !== "your-anthropic-key-here") return "claude";
   return "none";
 }
