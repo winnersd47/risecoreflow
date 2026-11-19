@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev --port 3050",
     "build": "next build",
+    "vercel-build": "npx prisma db push && next build",
     "start": "next start",
     "lint": "eslint"
   },
