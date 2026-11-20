@@ -7,6 +7,7 @@ import {
   LayoutDashboard, CalendarDays, CheckSquare, Bot, BarChart3,
   FolderOpen, TrendingUp, FlaskConical, Megaphone, Swords, Target,
   Rocket, Users, Zap, Settings, LogOut, User, CreditCard, Send, Sparkles,
+  Menu, X,
 } from "lucide-react";
 import { NotificationBell } from "./NotificationBell";
 import { MarketingGlossary } from "./MarketingGlossary";
@@ -17,10 +18,14 @@ interface SidebarProps { projectId?: string; }
 export function Sidebar({ projectId }: SidebarProps) {
   const pathname = usePathname();
   const [user, setUser] = useState<any>(null);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
     fetch("/api/auth/me").then(r => r.ok ? r.json() : null).then(u => { if (u) setUser(u); });
   }, []);
+
+  // Close drawer on route change
+  useEffect(() => { setMobileOpen(false); }, [pathname]);
 
   const IS_PRO = user?.plan === "pro" || user?.plan === "agency";
 
@@ -53,25 +58,8 @@ export function Sidebar({ projectId }: SidebarProps) {
     { href: `/projects/${projectId}/icps`,        icon: Target,       label: "ICP",           pro: true },
   ] : [];
 
-  return (
-    <aside className="w-56 flex-shrink-0 flex flex-col h-full"
-      style={{ background: "#09071a", borderRight: "1px solid #1e1c38" }}>
-
-      {/* Logo + Bell */}
-      <div className="px-4 py-4 flex items-center justify-between" style={{ borderBottom: "1px solid #1e1c38" }}>
-        <Link href="/" className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
-            style={{ background: "linear-gradient(135deg, #f59e0b22, #6366f122)", border: "1px solid #f59e0b44" }}>
-            <TrendingUp className="w-3.5 h-3.5" style={{ color: "#f59e0b" }} />
-          </div>
-          <span className="font-bold text-sm tracking-tight"
-            style={{ background: "linear-gradient(90deg, #f59e0b, #a78bfa)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-            RiseCoreFlow
-          </span>
-        </Link>
-        <NotificationBell />
-      </div>
-
+  const innerContent = (
+    <>
       {/* Nav */}
       <nav className="flex-1 py-3 space-y-0.5 px-3 overflow-y-auto">
         {globalNav.map(item => <NavLink key={item.href} item={item} pathname={pathname} />)}
@@ -168,7 +156,82 @@ export function Sidebar({ projectId }: SidebarProps) {
           </span>
         </div>
       </div>
-    </aside>
+    </>
+  );
+
+  const logoBlock = (
+    <div className="px-4 py-4 flex items-center justify-between flex-shrink-0" style={{ borderBottom: "1px solid #1e1c38" }}>
+      <Link href="/" className="flex items-center gap-2">
+        <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
+          style={{ background: "linear-gradient(135deg, #f59e0b22, #6366f122)", border: "1px solid #f59e0b44" }}>
+          <TrendingUp className="w-3.5 h-3.5" style={{ color: "#f59e0b" }} />
+        </div>
+        <span className="font-bold text-sm tracking-tight"
+          style={{ background: "linear-gradient(90deg, #f59e0b, #a78bfa)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+          RiseCoreFlow
+        </span>
+      </Link>
+      <NotificationBell />
+    </div>
+  );
+
+  return (
+    <>
+      {/* Desktop sidebar */}
+      <aside className="hidden lg:flex w-56 flex-shrink-0 flex-col h-full"
+        style={{ background: "#09071a", borderRight: "1px solid #1e1c38" }}>
+        {logoBlock}
+        {innerContent}
+      </aside>
+
+      {/* Mobile hamburger button */}
+      <button
+        className="lg:hidden fixed top-3 left-3 z-40 p-2 rounded-lg"
+        style={{ background: "#09071a", border: "1px solid #1e1c38", color: "#f59e0b" }}
+        onClick={() => setMobileOpen(true)}
+        aria-label="Открыть меню"
+      >
+        <Menu className="w-5 h-5" />
+      </button>
+
+      {/* Mobile drawer overlay */}
+      {mobileOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0"
+            style={{ background: "rgba(0,0,0,0.6)" }}
+            onClick={() => setMobileOpen(false)}
+          />
+          {/* Drawer panel */}
+          <aside className="absolute left-0 top-0 h-full w-64 flex flex-col"
+            style={{ background: "#09071a", borderRight: "1px solid #1e1c38" }}>
+            {/* Mobile header with close */}
+            <div className="px-4 py-4 flex items-center justify-between flex-shrink-0" style={{ borderBottom: "1px solid #1e1c38" }}>
+              <Link href="/" className="flex items-center gap-2" onClick={() => setMobileOpen(false)}>
+                <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
+                  style={{ background: "linear-gradient(135deg, #f59e0b22, #6366f122)", border: "1px solid #f59e0b44" }}>
+                  <TrendingUp className="w-3.5 h-3.5" style={{ color: "#f59e0b" }} />
+                </div>
+                <span className="font-bold text-sm tracking-tight"
+                  style={{ background: "linear-gradient(90deg, #f59e0b, #a78bfa)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+                  RiseCoreFlow
+                </span>
+              </Link>
+              <button
+                onClick={() => setMobileOpen(false)}
+                className="p-1 rounded-lg transition-colors"
+                style={{ color: "#6b6885" }}
+                aria-label="Закрыть меню"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            {innerContent}
+          </aside>
+        </div>
+      )}
+    </>
   );
 }
 
