@@ -4,8 +4,8 @@ import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const db = new Database(path.resolve(__dirname, "../dev.db"));
-const BOT_TOKEN = "8942312432:AAH2veIFPzRiJIavz9VuG2ILgk3AUY7HaHU";
-const AIGC_GROUP = -1003780381762;
+const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || "";
+const AIGC_GROUP = Number(process.env.TELEGRAM_BOT_GROUP_AIGC_ID || "-1003780381762");
 
 async function del(chatId, msgId) {
   const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/deleteMessage`, {

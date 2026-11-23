@@ -20,10 +20,10 @@ if (proj) {
   const defaultSettings = JSON.stringify({
     token: process.env.TELEGRAM_BOT_TOKEN || "",
     sourceChannels: [
-      { id: "-1003686120408", label: "Profiles Channel" },
-      { id: "-1004443980058", label: "VIP Channel" },
+      { id: process.env.TELEGRAM_BOT_CHANNEL_PROFILES_ID || "-1003686120408", label: "Profiles Channel" },
+      { id: process.env.TELEGRAM_BOT_CHANNEL_VIP_ID || "-1004443980058", label: "VIP Channel" },
     ],
-    targetGroupId: "-1003780381762",
+    targetGroupId: process.env.TELEGRAM_BOT_GROUP_AIGC_ID || "-1003780381762",
     targetGroupLabel: "AI Growth Club",
     forwardTags: ["#repost", "#aigc"],
   });
