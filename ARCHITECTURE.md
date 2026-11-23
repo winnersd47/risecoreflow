@@ -504,7 +504,7 @@ BOT_CONFIGS = {
 DATABASE_URL="file:./dev.db"
 
 # ── Auth ──────────────────────────────────────
-JWT_SECRET="risecoreflow-jwt-secret-change-in-production-32chars!!"
+JWT_SECRET="<your-jwt-secret-min-32-chars>"
 JWT_EXPIRES_IN="7d"
 
 # ── AI Engine (Gemini бесплатный = приоритет) ─
@@ -526,7 +526,7 @@ TELEGRAM_BOT_TOKEN=""
 
 # ── Promo Codes (CODE:DAYS, через запятую) ────
 # При регистрации: код → автоматически выдаётся Pro на N дней
-PROMO_CODES="WELCOME7:7,TRIAL3:3,LAUNCH30:30,PARTNER14:14,RISECOREFLOW:30"
+PROMO_CODES="CODE1:7,CODE2:30"
 
 # ── App ───────────────────────────────────────
 NEXT_PUBLIC_APP_URL="http://localhost:3050"
