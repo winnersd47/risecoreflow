@@ -5,7 +5,7 @@ import crypto from "crypto";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const db = new Database(path.resolve(__dirname, "../dev.db"));
-const BOT_TOKEN = "8942312432:AAH2veIFPzRiJIavz9VuG2ILgk3AUY7HaHU";
+const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || "";
 const API = `https://api.telegram.org/bot${BOT_TOKEN}`;
 
 async function tg(method, body) {
@@ -76,7 +76,7 @@ for (const rep of replacements) {
 
   // Also delete AIGC forward (search SendLog for chatId = AIGC group)
   const aigcEntry = db.prepare("SELECT messageId, chatId FROM SendLog WHERE stepId=? AND chatId=?")
-    .get(step.id, "-1003780381762");
+    .get(step.id, process.env.TELEGRAM_BOT_GROUP_AIGC_ID || "");
   // Actually AIGC forwards might not be in SendLog - let's skip for now
 
   // 2. Update mediaUrl + reset to sending

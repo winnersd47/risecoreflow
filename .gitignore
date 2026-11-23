@@ -32,6 +32,7 @@ yarn-error.log*
 
 # application logs
 *.log
+*.log.err
 
 # local sqlite database
 *.db

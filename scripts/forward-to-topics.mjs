@@ -5,7 +5,7 @@ import { fileURLToPath } from "url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const db = new Database(path.resolve(__dirname, "../dev.db"));
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || "";
-const AIGC_GROUP = Number(process.env.TELEGRAM_BOT_GROUP_AIGC_ID || "-1003780381762");
+const AIGC_GROUP = Number(process.env.TELEGRAM_BOT_GROUP_AIGC_ID || "0");
 
 async function api(method, body) {
   const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/${method}`, {

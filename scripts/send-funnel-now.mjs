@@ -9,7 +9,7 @@ import crypto from "crypto";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const db = new Database(path.resolve(__dirname, "../dev.db"));
-const BOT_TOKEN = "8942312432:AAH2veIFPzRiJIavz9VuG2ILgk3AUY7HaHU";
+const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || "";
 const API = `https://api.telegram.org/bot${BOT_TOKEN}`;
 
 async function tg(method, body) {
